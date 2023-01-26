@@ -154,8 +154,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   //แสดงแจ้งเตื่อนถึงเวลาปิดงานทันที
   Future<void> show_notification(title, body) async {
     const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-            'nextflow_noti_001', 'แจ้งเตือนทั่วไป', 'แจ้งเตือนทั่วไป',
+        AndroidNotificationDetails('nextflow_noti_001', 'แจ้งเตือนทั่วไป',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker');
@@ -175,8 +174,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       var minute = now.minute;
       var timeDelayed = DateTime.now().add(Duration(seconds: 1));
       const AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails(
-              'nextflow_noti_001', 'แจ้งเตือนทั่วไป', 'แจ้งเตือนทั่วไป',
+          AndroidNotificationDetails('nextflow_noti_001', 'แจ้งเตือนทั่วไป',
               importance: Importance.max,
               priority: Priority.high,
               ticker: 'ticker');

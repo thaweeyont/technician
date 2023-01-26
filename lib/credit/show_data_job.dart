@@ -184,7 +184,7 @@ class _show_data_jobState extends State<show_data_job> {
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          overflow: Overflow.visible,
+          clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: <Widget>[
             Container(

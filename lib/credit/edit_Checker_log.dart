@@ -689,8 +689,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          overflow: Overflow.visible,
-          alignment: Alignment.center,
+          clipBehavior: Clip.none, alignment: Alignment.center,
           children: <Widget>[
             Container(
               width: double.infinity,
