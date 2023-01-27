@@ -1,0 +1,14 @@
+//
+//  < target_name>-Prefix.pch
+//  Runner
+//
+//  Created by TWY_MAC on 27/1/2566 BE.
+//
+
+#ifndef __target_name__Prefix_pch
+#define __target_name__Prefix_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* __target_name__Prefix_pch */

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>687609059088-74d2u5lf5vti10pdfatjcl4q5dp4k4fi.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.687609059088-74d2u5lf5vti10pdfatjcl4q5dp4k4fi</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCDLYPdrsqObUenoDY-n5vb9kZNLJn7AVk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>687609059088</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.twytrack.technician</string>
+	<key>PROJECT_ID</key>
+	<string>technician-9962e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>technician-9962e.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:687609059088:ios:22f8cf92f937ffef29b795</string>
+</dict>
+</plist>
