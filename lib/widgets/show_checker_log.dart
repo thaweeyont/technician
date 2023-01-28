@@ -43,6 +43,8 @@ class _ShowCheckerLogState extends State<ShowCheckerLog> {
           normalDialog(context, 'Error',
               "ขออภัย คุณไม่มีสิทธิ์เข้าถึง หน้า Checker Log");
         }
+      } else {
+        normalDialog(context, 'Error', "check error");
       }
     } catch (e) {
       // print("ไม่มีข้อมูล");

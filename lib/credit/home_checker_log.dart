@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:technician/credit/add_checker_log.dart';
 import 'package:technician/credit/edit_Checker_log.dart';
+import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
 import 'package:technician/models/customer_checker_logmodel.dart';
@@ -48,6 +49,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         print("==============${data_customer[0].cusAddressImg}");
       }
     } catch (e) {
+      print(e);
       data_customer = [];
       var respose = await http.get(Uri.http(ipconfig_checker_office,
           '/checker_data/customer_checker_mobile.php', {
@@ -56,12 +58,13 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         "name_user": name_user,
       }));
       if (respose.statusCode == 200) {
-        // print(respose.body);
         setState(() {
           print("zzzzzzzzzzzzzz");
           data_customer = customerCheckerLogModelFromJson(respose.body);
         });
         print("--------------${data_customer[0].cusAddressImg}");
+      } else {
+        normalDialog(context, 'Error', "check error");
       }
     }
   }
@@ -373,7 +376,15 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
                                               MyConstant().normalyelloStyle(),
                                         ),
                                         onPressed: () {
-                                          if (data_customer[i].idUser!.isNotEmpty &&data_customer[i].runnigId!.isNotEmpty &&data_customer[i].typeRunning!.isNotEmpty) {
+                                          if (data_customer[i]
+                                                  .idUser!
+                                                  .isNotEmpty &&
+                                              data_customer[i]
+                                                  .runnigId!
+                                                  .isNotEmpty &&
+                                              data_customer[i]
+                                                  .typeRunning!
+                                                  .isNotEmpty) {
                                             Navigator.push(context,
                                                 CupertinoPageRoute(
                                                     builder: (context) {

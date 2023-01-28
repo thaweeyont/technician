@@ -31,11 +31,11 @@ dependencies:
   dio: ^4.0.0
   flutter_image_slideshow: ^0.1.0  
   shared_preferences: ^2.0.6 
-  firebase_messaging: ^10.0.0
-  firebase_core: ^1.2.0
-  intl: ^0.17.0
-  direct_select: "^1.0.3"
-  icon_picker: "^1.0.0"
+  firebase_messaging: ^14.2.1
+  firebase_core: ^2.4.1
+  intl: ^0.18.0
+  direct_select: ^2.0.0
+  icon_picker: ^2.1.0
   flutter_datetime_picker: ^1.5.1
   qrscan: ^0.3.2
   flutter_animated_dialog: ^2.0.1
@@ -44,8 +44,8 @@ dependencies:
   package_info: ^2.0.2
   # geocoding: ^2.0.1
   decorated_icon: ^1.2.1
-  permission_handler: ^9.2.0
-  geolocator: ^7.7.0
+  permission_handler: ^10.2.0
+  geolocator: ^9.0.2
   geocoding: ^2.0.1
   # qrscans: ^0.0.7
   # searchable_dropdown: ^1.1.3
