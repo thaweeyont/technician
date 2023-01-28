@@ -49,7 +49,6 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         print("==============${data_customer[0].cusAddressImg}");
       }
     } catch (e) {
-      print(widget.level);
       data_customer = [];
       var respose = await http.get(Uri.http(ipconfig_checker_office,
           '/checker_data/customer_checker_mobile.php', {
