@@ -9,7 +9,9 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:http/http.dart' as http;
+import 'package:responsive_flutter/responsive_flutter.dart';
+
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/models/address_usermodel.dart';
@@ -18,8 +20,6 @@ import 'package:technician/sale/edit_address.dart';
 import 'package:technician/sale/sale.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
-import 'package:http/http.dart' as http;
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class Addlocation extends StatefulWidget {
   final String id_gen, idcard, lat_old, lng_old;

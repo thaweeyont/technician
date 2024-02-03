@@ -58,7 +58,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getversion();
   }
@@ -429,7 +428,7 @@ class _LoginState extends State<Login> {
         color: Colors.white,
       ),
       width: double.infinity,
-      height: size * 0.35,
+      height: size * 0.30,
       child: Image.asset(
         'images/logo_mc2.png',
       ),

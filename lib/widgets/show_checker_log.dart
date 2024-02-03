@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:technician/credit/home_checker_log.dart';
@@ -17,22 +18,26 @@ class ShowCheckerLog extends StatefulWidget {
 }
 
 class _ShowCheckerLogState extends State<ShowCheckerLog> {
-  List<UserCheckerLogModel> data_checker_log = [];
+  List data_checker_log = [];
 
   //เรียกใช้ api login
   Future<Null> checker_log(idstaff) async {
     try {
-      var respose = await http.get(Uri.http(ipconfig_checker,
-          '/checker_data/login_mobile.php', {"pws_us": idstaff}));
+      var respose = await http.get(Uri.http(
+        ipconfig_checker,
+        '/CheckerData2/api/Login.php',
+        {"pws_us": idstaff},
+      ));
       if (respose.statusCode == 200) {
         setState(() {
-          data_checker_log = userCheckerLogModelFromJson(respose.body);
+          // data_checker_log = userCheckerLogModelFromJson(respose.body);
+          data_checker_log = json.decode(respose.body);
         });
-        var zone = data_checker_log[0].zone;
-        var saka = data_checker_log[0].saka;
-        var name_user = data_checker_log[0].nameUser;
-        var level = data_checker_log[0].levelStatus;
-        var ip_conn = ipconfig_checker;
+        var zone = data_checker_log[0]['zone'];
+        var saka = data_checker_log[0]['saka'];
+        var name_user = data_checker_log[0]['name_user'];
+        var level = data_checker_log[0]['level_status'];
+        var ip_conn = ipconfig_checker_office;
         print("========>auther");
         if (respose.body != 'error') {
           Navigator.push(context, CupertinoPageRoute(builder: (context) {
@@ -49,15 +54,16 @@ class _ShowCheckerLogState extends State<ShowCheckerLog> {
     } catch (e) {
       // print("ไม่มีข้อมูล");
       var respose = await http.get(Uri.http(ipconfig_checker_office,
-          '/checker_data/login_mobile.php', {"pws_us": idstaff}));
+          '/CheckerData2/api/Login.php', {"pws_us": idstaff}));
       if (respose.statusCode == 200) {
         setState(() {
-          data_checker_log = userCheckerLogModelFromJson(respose.body);
+          // data_checker_log = userCheckerLogModelFromJson(respose.body);
+          data_checker_log = json.decode(respose.body);
         });
-        var zone = data_checker_log[0].zone;
-        var saka = data_checker_log[0].saka;
-        var name_user = data_checker_log[0].nameUser;
-        var level = data_checker_log[0].levelStatus;
+        var zone = data_checker_log[0]['zone'];
+        var saka = data_checker_log[0]['saka'];
+        var name_user = data_checker_log[0]['name_user'];
+        var level = data_checker_log[0]['level_status'];
         var ip_conn = ipconfig_checker_office;
         print("========>office");
         if (respose.body != 'error') {

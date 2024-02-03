@@ -283,7 +283,7 @@ class _CreditState extends State<Credit> {
                 color: Colors.white,
               ),
               width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.20,
+              height: MediaQuery.of(context).size.height * 0.17,
               child: Image.asset(
                 'images/logo_mc2.png',
               ),

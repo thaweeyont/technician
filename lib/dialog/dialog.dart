@@ -2,10 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/utility/my_constant.dart';
+import 'package:loading_gifs/loading_gifs.dart';
 
 Future<Null> showProgressDialog(BuildContext context) async {
   showDialog(
@@ -17,6 +16,34 @@ Future<Null> showProgressDialog(BuildContext context) async {
       onWillPop: () async {
         return false;
       },
+    ),
+  );
+}
+
+Future<void> showProgressLoading(BuildContext context) async {
+  showDialog(
+    context: context,
+    barrierColor: Colors.transparent,
+    builder: (context) => Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 24, 24, 24).withOpacity(0.9),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(cupertinoActivityIndicator, scale: 4),
+            // Text(
+            //   'กำลังโหลด',
+            //   style: MyConstant().textLoading(),
+            // ),
+          ],
+        ),
+      ),
     ),
   );
 }
@@ -56,7 +83,7 @@ Future<Null> normalDialog(
     ),
     animationType: DialogTransitionType.fadeScale,
     curve: Curves.fastOutSlowIn,
-    duration: Duration(seconds: 1),
+    duration: Duration(seconds: 0),
   );
 }
 

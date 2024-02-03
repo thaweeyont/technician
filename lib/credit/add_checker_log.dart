@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
@@ -11,7 +10,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:technician/dialog/dialog.dart';
-import 'package:technician/ipconfig.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
@@ -28,8 +26,6 @@ class AddCheckerLog extends StatefulWidget {
 class _AddCheckerLogState extends State<AddCheckerLog> {
   double? lat, lng;
   String? selectedValue;
-  // String? zoneValue;
-  // String? sakaValue;
   File? file;
   File? file_kam1;
   File? file_kam2;
@@ -60,9 +56,9 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   String? val_zone;
   String? val_saka;
   String? prefixname_customer_text;
-  String? prefixname_kam1_text = "นาย";
-  String? prefixname_kam2_text = "นาย";
-  String? prefixname_kam3_text = "นาย";
+  String? prefixname_kam1_text;
+  String? prefixname_kam2_text;
+  String? prefixname_kam3_text;
   // ตั้ง id text in put
   TextEditingController id_running_text = TextEditingController();
   // TextEditingController prefixname_customer_text = TextEditingController();
@@ -78,30 +74,31 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   Completer<GoogleMapController> _controller = Completer();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _list_zone();
-    _list_saka(widget.zone);
     st_set_val();
+    // _list_saka(widget.zone.toString());
     type_running();
     CheckPermission();
     initialFile_customer();
+    _list_zone();
   }
 
   //set_st_value
-  Future<Null> st_set_val() async {
-    setState(() {
-      val_zone = widget.zone;
-      val_saka = widget.saka;
-    });
+  Future<void> st_set_val() async {
+    if (widget.level == 'checker') {
+      setState(() {
+        val_zone = widget.zone;
+        val_saka = widget.saka;
+      });
+    }
     print("zone=>$val_zone saka=>$val_saka");
   }
 
   //type_runing
   Future<Null> type_running() async {
     try {
-      var respose = await http.get(
-          Uri.http(ipconfig_checker, '/checker_data/type_runing_mobile.php'));
+      var respose = await http
+          .get(Uri.http(ipconfig_checker, '/CheckerData2/api/TypeRunning.php'));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -110,7 +107,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       }
     } catch (e) {
       var respose = await http.get(Uri.http(
-          ipconfig_checker_office, '/checker_data/type_runing_mobile.php'));
+          ipconfig_checker_office, '/CheckerData2/api/TypeRunning.php'));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -121,46 +118,46 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   }
 
   //list_zone
-  Future<Null> _list_zone() async {
+  Future<void> _list_zone() async {
     try {
       var respose = await http
-          .get(Uri.http(ipconfig_checker, '/checker_data/zone_mobile.php'));
+          .get(Uri.http(ipconfig_checker, '/CheckerData2/api/Zone.php'));
       if (respose.statusCode == 200) {
-        var jsonData = jsonDecode(respose.body);
+        var jsonData = json.decode(respose.body);
         setState(() {
           list_zone = jsonData;
         });
+        // _list_saka(val_zone);
       }
     } catch (e) {
-      var respose = await http.get(
-          Uri.http(ipconfig_checker_office, '/checker_data/zone_mobile.php'));
+      var respose = await http
+          .get(Uri.http(ipconfig_checker_office, '/CheckerData2/api/Zone.php'));
       if (respose.statusCode == 200) {
-        var jsonData = jsonDecode(respose.body);
+        var jsonData = json.decode(respose.body);
         setState(() {
           list_zone = jsonData;
         });
+        // _list_saka(val_zone);
       }
     }
   }
 
   //list_saka
-  Future<Null> _list_saka(zone) async {
-    list_saka = [];
-    val_saka = null;
+  Future<void> _list_saka(zone) async {
     try {
       var respose = await http.get(Uri.http(ipconfig_checker,
-          '/checker_data/saka_mobile.php', {"zone": zone.toString()}));
+          '/CheckerData2/api/Branch.php', {"zone": zone.toString()}));
       if (respose.statusCode == 200) {
-        var jsonData = jsonDecode(respose.body);
+        var jsonData = json.decode(respose.body);
         setState(() {
           list_saka = jsonData;
         });
       }
     } catch (e) {
       var respose = await http.get(Uri.http(ipconfig_checker_office,
-          '/checker_data/saka_mobile.php', {"zone": zone.toString()}));
+          '/CheckerData2/api/Branch.php', {"zone": zone.toString()}));
       if (respose.statusCode == 200) {
-        var jsonData = jsonDecode(respose.body);
+        var jsonData = json.decode(respose.body);
         setState(() {
           list_saka = jsonData;
         });
@@ -168,7 +165,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     }
   }
 
-  //CheckPermission
+  // CheckPermission
   Future<Null> CheckPermission() async {
     bool locationService;
     LocationPermission locationPermission;
@@ -277,18 +274,17 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_customer(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
       );
-
       setState(() {
         file = File(result!.path);
         files[index] = file;
@@ -385,13 +381,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_kam1(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -497,13 +493,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_kam2(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -609,13 +605,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_kam3(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -722,13 +718,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_other(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -830,13 +826,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_more(ImageSource source) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -863,20 +859,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         index_more = files_more.length;
         print("xxxxxxxxxxxxxxxxxxxxx");
       }
-      //   files_more[index] = null;
-      //   int count_other = 0;
-      //   for (var item in files_other) {
-      //     if (item == null) {
-      //       count_other++;
-      //     }
-      //   }
-      //   if (count_other == 0) {
-      //     check_other = 1;
-      //   } else if (count_other == 2) {
-      //     check_other = 0;
-      //   } else {
-      //     check_other = 2;
-      //   }
     });
   }
 
@@ -889,7 +871,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         int i = Random().nextInt(10000000);
         String nameFile = 'checker$i.jpg';
         String api_upload_img_customer =
-            'http://$ipconfig_checker/checker_data/uploadimage_customer_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
+            'http://$ipconfig_checker/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
         Map<String, dynamic> map_customer = {};
         map_customer['file'] = await MultipartFile.fromFile(
             file_img_customer!.path,
@@ -899,97 +881,68 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             .post(api_upload_img_customer, data: data_customer)
             .then((value) {
           print(value);
-          // Navigator.pop(context);
-          // print("---------------- success upload ----------------------");
         });
       }
       //บันทึกผู้ค้ำ 1
       if (check_kam1 == 1) {
+        int CountIndexG1 = 0;
         for (var file_img_kam1 in files_kam1) {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam1$i.jpg';
           String api_upload_img_kam1 =
-              'http://$ipconfig_checker/checker_data/uploadimage_kam1_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text&CountIndexG1=$CountIndexG1';
           Map<String, dynamic> map_kam1 = {};
           map_kam1['file'] = await MultipartFile.fromFile(file_img_kam1!.path,
               filename: nameFile);
+          CountIndexG1 = CountIndexG1 + 1;
           FormData data_kam1 = FormData.fromMap(map_kam1);
           var response = await Dio()
               .post(api_upload_img_kam1, data: data_kam1)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker/checker_data/null_kam1_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 1 สำเร็จ");
         }
       }
 
       //บันทึกผู้ค้ำ 2
       if (check_kam2 == 1) {
+        int CountIndexG2 = 0;
         for (var file_img_kam2 in files_kam2) {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam2$i.jpg';
           String api_upload_img_kam2 =
-              'http://$ipconfig_checker/checker_data/uploadimage_kam2_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text&CountIndexG2=$CountIndexG2';
           Map<String, dynamic> map_kam2 = {};
           map_kam2['file'] = await MultipartFile.fromFile(file_img_kam2!.path,
               filename: nameFile);
+          CountIndexG2 = CountIndexG2 + 1;
           FormData data_kam2 = FormData.fromMap(map_kam2);
           var response = await Dio()
               .post(api_upload_img_kam2, data: data_kam2)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker/checker_data/null_kam2_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 2 สำเร็จ");
         }
       }
 
       //บันทึกผู้ค้ำ 3
       if (check_kam3 == 1) {
+        int CountIndexG3 = 0;
         for (var file_img_kam3 in files_kam3) {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam3$i.jpg';
           String api_upload_img_kam3 =
-              'http://$ipconfig_checker/checker_data/uploadimage_kam3_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_lam=$prefixname_kam3_text';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_lam=$prefixname_kam3_text&CountIndexG3=$CountIndexG3';
           Map<String, dynamic> map_kam3 = {};
           map_kam3['file'] = await MultipartFile.fromFile(file_img_kam3!.path,
               filename: nameFile);
+          CountIndexG3 = CountIndexG3 + 1;
           FormData data_kam3 = FormData.fromMap(map_kam3);
           var response = await Dio()
               .post(api_upload_img_kam3, data: data_kam3)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker/checker_data/null_kam3_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 3 สำเร็จ");
         }
       }
 
@@ -999,7 +952,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_other$i.jpg';
           String api_upload_img_other =
-              'http://$ipconfig_checker/checker_data/uploadimage_other_mobile.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
           Map<String, dynamic> map_other = {};
           map_other['file'] = await MultipartFile.fromFile(file_img_other!.path,
               filename: nameFile);
@@ -1008,18 +961,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_other, data: data_other)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker/checker_data/null_other_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มี other สำเร็จ");
         }
       }
 
@@ -1028,7 +970,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_more$i.jpg';
           String api_upload_img_more =
-              'http://$ipconfig_checker/checker_data/uploadimage_more_mobile.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
           Map<String, dynamic> map_more = {};
           map_more['file'] = await MultipartFile.fromFile(file_img_more!.path,
               filename: nameFile);
@@ -1037,8 +979,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_more, data: data_more)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
         }
       }
@@ -1050,7 +990,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         int i = Random().nextInt(10000000);
         String nameFile = 'checker$i.jpg';
         String api_upload_img_customer =
-            'http://$ipconfig_checker_office/checker_data/uploadimage_customer_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
+            'http://$ipconfig_checker_office/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
         Map<String, dynamic> map_customer = {};
         map_customer['file'] = await MultipartFile.fromFile(
             file_img_customer!.path,
@@ -1060,8 +1000,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             .post(api_upload_img_customer, data: data_customer)
             .then((value) {
           print(value);
-          // Navigator.pop(context);
-          // print("---------------- success upload ----------------------");
         });
       }
       //บันทึกผู้ค้ำ 1
@@ -1070,7 +1008,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam1$i.jpg';
           String api_upload_img_kam1 =
-              'http://$ipconfig_checker_office/checker_data/uploadimage_kam1_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text';
           Map<String, dynamic> map_kam1 = {};
           map_kam1['file'] = await MultipartFile.fromFile(file_img_kam1!.path,
               filename: nameFile);
@@ -1079,18 +1017,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_kam1, data: data_kam1)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker_office/checker_data/null_kam1_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 1 สำเร็จ");
         }
       }
 
@@ -1100,7 +1027,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam2$i.jpg';
           String api_upload_img_kam2 =
-              'http://$ipconfig_checker_office/checker_data/uploadimage_kam2_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text';
           Map<String, dynamic> map_kam2 = {};
           map_kam2['file'] = await MultipartFile.fromFile(file_img_kam2!.path,
               filename: nameFile);
@@ -1109,18 +1036,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_kam2, data: data_kam2)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker_office/checker_data/null_kam2_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 2 สำเร็จ");
         }
       }
 
@@ -1130,7 +1046,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam3$i.jpg';
           String api_upload_img_kam3 =
-              'http://$ipconfig_checker_office/checker_data/uploadimage_kam3_mobile_v2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text';
           Map<String, dynamic> map_kam3 = {};
           map_kam3['file'] = await MultipartFile.fromFile(file_img_kam3!.path,
               filename: nameFile);
@@ -1139,18 +1055,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_kam3, data: data_kam3)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker_office/checker_data/null_kam3_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มีผู้ค้ำ 3 สำเร็จ");
         }
       }
 
@@ -1160,7 +1065,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_other$i.jpg';
           String api_upload_img_other =
-              'http://$ipconfig_checker_office/checker_data/uploadimage_other_mobile.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
           Map<String, dynamic> map_other = {};
           map_other['file'] = await MultipartFile.fromFile(file_img_other!.path,
               filename: nameFile);
@@ -1169,18 +1074,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_other, data: data_other)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
-        }
-      } else {
-        var uri = Uri.parse(
-            "http://$ipconfig_checker_office/checker_data/null_other_mobile.php");
-        var request = new http.MultipartRequest("POST", uri);
-        request.fields['running_id'] = id_running_text.text;
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print("บันทึกไม่มี other สำเร็จ");
         }
       }
 
@@ -1189,7 +1083,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_more$i.jpg';
           String api_upload_img_more =
-              'http://$ipconfig_checker_office/checker_data/uploadimage_more_mobile.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
           Map<String, dynamic> map_more = {};
           map_more['file'] = await MultipartFile.fromFile(file_img_more!.path,
               filename: nameFile);
@@ -1198,8 +1092,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
               .post(api_upload_img_more, data: data_more)
               .then((value) {
             print(value);
-            // Navigator.pop(context);
-            // print("---------------- success upload ----------------------");
           });
         }
       }
@@ -1217,7 +1109,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     }
     // print("------------>$Files_customer");
     if (Files_customer == 0) {
-      showProgressDialog(context);
+      showProgressLoading(context);
       upload_file();
     } else {
       normalDialog(context, 'แจ้งเตือน', 'กรุณาเพิ่มรูปผู้ซื้อให้ครบถ้วน');
@@ -1265,10 +1157,10 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   Future<Null> Checker_runing(type, runnig_id) async {
     // data_customer = [];
     try {
-      var respose = await http.get(Uri.http(
-          '$ipconfig_checker', '/checker_data/check_runing_mobile.php', {
-        "type_runnig": type,
-        "runnig_id": runnig_id,
+      var respose = await http.get(
+          Uri.http('$ipconfig_checker', '/CheckerData2/api/CheckRunning.php', {
+        "type_running": type,
+        "running_id": runnig_id,
       }));
       if (respose.statusCode == 200) {
         print(respose.body);
@@ -1293,9 +1185,9 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     } catch (e) {
       // print("--------------");
       var respose = await http.get(Uri.http(
-          '$ipconfig_checker_office', '/checker_data/check_runing_mobile.php', {
-        "type_runnig": type,
-        "runnig_id": runnig_id,
+          '$ipconfig_checker_office', '/CheckerData2/api/CheckRunning.php', {
+        "type_running": type,
+        "running_id": runnig_id,
       }));
       if (respose.statusCode == 200) {
         print(respose.body);
@@ -1389,7 +1281,8 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          clipBehavior: Clip.none, alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -1515,12 +1408,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                     SizedBox(height: 10),
                     input_other(size),
                   ],
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   input_more(size),
                   SizedBox(height: 20),
                   name_admin(),
                   SizedBox(height: 10),
                   button_change(),
+                  SizedBox(height: 15),
                 ],
               ),
             ),
@@ -1551,7 +1445,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                       ],
                     ),
                   ),
-                  filtter_branch(context),
+                  filtter_typerunnig(context),
                 ],
               ),
             ),
@@ -1588,25 +1482,39 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             return null;
                           },
                           decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            errorStyle: TextStyle(fontSize: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
                             prefixIcon: Icon(Icons.confirmation_number),
+                            suffixIcon: check_runing == true
+                                ? Icon(
+                                    Icons.check,
+                                    color: Colors.green,
+                                    size: size * 0.06,
+                                  )
+                                : Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: size * 0.06,
+                                  ),
                             labelText: "เลขรันนิ่งสัญญา",
                             labelStyle: MyConstant().normalStyle(),
                           ),
                         ),
                       ),
-                      if (check_runing == true) ...[
-                        Icon(
-                          Icons.check,
-                          color: Colors.green,
-                          size: size * 0.06,
-                        ),
-                      ] else if (check_runing == false) ...[
-                        Icon(
-                          Icons.close,
-                          color: Colors.red,
-                          size: size * 0.06,
-                        ),
-                      ],
+                      // check_runing == true
+                      //     ? Icon(
+                      //         Icons.check,
+                      //         color: Colors.green,
+                      //         size: size * 0.06,
+                      //       )
+                      //     : Icon(
+                      //         Icons.close,
+                      //         color: Colors.red,
+                      //         size: size * 0.06,
+                      //       ),
                     ],
                   ),
                 ],
@@ -1673,7 +1581,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       );
 
   //ประเภทเอกสาร
-  Row filtter_branch(BuildContext context) {
+  Row filtter_typerunnig(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1682,7 +1590,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.width * 0.11,
+                // height: MediaQuery.of(context).size.width * 0.11,
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 decoration: ShapeDecoration(
                   shape: RoundedRectangleBorder(
@@ -1772,6 +1680,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                     setState(() {
                       val_zone = value as String?;
                       _list_saka(val_zone);
+                      print('saka>>>$list_saka');
                     });
                   },
                   underline: Container(
@@ -1894,91 +1803,109 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(bottom: 10.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: prefixname_customer_text,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          elevation: 16,
-                          style: const TextStyle(color: Colors.deepPurple),
-                          hint: Text(
-                            "คำนำหน้าชื่อ",
-                            style: MyConstant().normalStyle(),
-                          ),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              prefixname_customer_text = newValue!;
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null) {
-                              return 'กรุณาเพิ่ม คำนำหน้าชื่อ';
-                            }
-                          },
-                          items: <String>['นาย', 'นางสาว', 'นาง']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: MyConstant().h3Style(),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          style: MyConstant().h3Style(),
-                          controller: name_customer_text,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'กรุณาเพิ่ม ชื่อ ผู้ซื้อ';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.location_history),
-                            labelText: "ชื่อ",
-                            labelStyle: MyConstant().normalStyle(),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: prefixname_customer_text,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        elevation: 16,
+                        decoration: InputDecoration(
+                          errorStyle: TextStyle(fontSize: 12),
+                          contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          style: MyConstant().h3Style(),
-                          controller: lastname_customer_text,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'กรุณาเพิ่ม นามสกุล ผู้ซื้อ';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.location_history),
-                            labelText: "นามสกุล",
-                            labelStyle: MyConstant().normalStyle(),
-                          ),
+                        style: const TextStyle(color: Colors.deepPurple),
+                        hint: Text(
+                          "คำนำหน้าชื่อ",
+                          style: MyConstant().normalStyle(),
                         ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            prefixname_customer_text = newValue!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'กรุณาเพิ่ม คำนำหน้าชื่อ';
+                          }
+                          return null;
+                        },
+                        items: <String>['นาย', 'นางสาว', 'นาง']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: MyConstant().h3Style(),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        style: MyConstant().h3Style(),
+                        controller: name_customer_text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'กรุณาเพิ่ม ชื่อ ผู้ซื้อ';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                          errorStyle: TextStyle(fontSize: 12),
+                          prefixIcon: Icon(Icons.location_history),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          labelText: "ชื่อ",
+                          labelStyle: MyConstant().normalStyle(),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        style: MyConstant().h3Style(),
+                        controller: lastname_customer_text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'กรุณาเพิ่ม นามสกุล ผู้ซื้อ';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                          errorStyle: TextStyle(fontSize: 12),
+                          prefixIcon: Icon(Icons.location_history),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          labelText: "นามสกุล",
+                          labelStyle: MyConstant().normalStyle(),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ],
             ),
+            SizedBox(height: 10),
             Container(
               margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
@@ -2362,6 +2289,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             value: prefixname_kam1_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -2386,6 +2320,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -2393,7 +2328,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam1_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "ชื่อ ผู้้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -2401,6 +2341,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -2408,7 +2349,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam1_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "นามสกุล ผู้้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -2433,7 +2379,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2475,7 +2421,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2517,7 +2463,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2565,7 +2511,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                           ),
                         ] else ...[
                           Text(
-                            "รูปตอนเซ็น",
+                            "รูปตอนเซ็น (ผู้ค้ำ 1)",
                             style: MyConstant().h3Style(),
                           ),
                         ],
@@ -2679,6 +2625,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             value: prefixname_kam2_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -2703,6 +2656,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -2710,7 +2664,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam2_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "ชื่อ ผู้้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -2718,6 +2677,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -2725,7 +2685,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam2_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "นามสกุล ผู้้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -2750,7 +2715,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2792,7 +2757,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2834,7 +2799,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -2882,7 +2847,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                           ),
                         ] else ...[
                           Text(
-                            "รูปตอนเซ็น",
+                            "รูปตอนเซ็น (ผู้ค้ำ 2)",
                             style: MyConstant().h3Style(),
                           ),
                         ],
@@ -2996,6 +2961,13 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             value: prefixname_kam3_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -3020,6 +2992,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -3027,7 +3000,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam3_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "ชื่อ ผู้้ค้ำ 3",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -3035,6 +3013,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -3042,7 +3021,12 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam3_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
                               labelText: "นามสกุล ผู้้ค้ำ 3",
                               labelStyle: MyConstant().normalStyle(),
                             ),
@@ -3067,7 +3051,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -3109,7 +3093,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -3151,7 +3135,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
@@ -3199,7 +3183,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                           ),
                         ] else ...[
                           Text(
-                            "รูปตอนเซ็น",
+                            "รูปตอนเซ็น (ผู้ค้ำ 3)",
                             style: MyConstant().h3Style(),
                           ),
                         ],
@@ -3457,7 +3441,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             ),
             if (show_more == true) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 10.0),
+                margin: EdgeInsets.only(bottom: 40.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -3475,11 +3459,23 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                         ),
                       ],
                     ),
+                    if (files_more.length > 0) ...[
+                      SizedBox(width: 10),
+                      Row(
+                        children: [
+                          Text(
+                            '*ภาพเพิ่มเติมมี ${files_more.length} ภาพ',
+                            style: MyConstant().h3Style(),
+                          ),
+                        ],
+                      ),
+                    ],
                     Column(
                       children: [
                         if (index_more > 0) ...[
                           show_imgmore(size),
                         ],
+                        SizedBox(height: 20),
                         InkWell(
                           onTap: () {
                             img_more("ภาพเพิ่มเติม");
@@ -3543,10 +3539,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                   check_other != 2 &&
                   val_saka != "" &&
                   val_saka != null) {
-                // print(check_kam1);
-                // print(check_kam2);
-                // print(check_kam3);
-                // validate_image();
                 if (check_kam3 == 1 && check_kam2 == 0) {
                   normalDialog(
                       context, "เตือน", "กรุณาระบุคนค้ำตามลำดับให้ถูกต้อง");
@@ -3576,21 +3568,19 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     return Stack(
       children: <Widget>[
         InkWell(
-          // onLongPress: () {
-          //   zoom_img(files, index);
-          // },
           child: Container(
+            padding: EdgeInsets.all(6),
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.45,
+            height: MediaQuery.of(context).size.height * 0.2,
             child: Image.file(
               files[index]!,
             ),
           ),
         ),
         Positioned(
-          top: 5,
-          right: 5,
+          top: 8,
+          right: 8,
           child: InkWell(
             onTap: () {
               delete_img_customer(index);
@@ -3601,11 +3591,10 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 borderRadius: BorderRadius.all(
                   Radius.circular(30),
                 ),
-                color: Colors.white38,
+                color: Color.fromARGB(97, 112, 112, 112),
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(27, 55, 120, 1.0),
-
                     offset: Offset(0, 0), // Shadow position
                   ),
                 ],
@@ -3626,19 +3615,19 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     return Stack(
       children: <Widget>[
         InkWell(
-          // onTap: () => zoom_img(0),
           child: Container(
+            padding: EdgeInsets.all(6),
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.45,
+            height: MediaQuery.of(context).size.height * 0.2,
             child: Image.file(
               files_kam1[index]!,
             ),
           ),
         ),
         Positioned(
-          top: 5,
-          right: 5,
+          top: 8,
+          right: 8,
           child: InkWell(
             onTap: () {
               delete_img_kam1(index);
@@ -3649,11 +3638,10 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 borderRadius: BorderRadius.all(
                   Radius.circular(30),
                 ),
-                color: Colors.white38,
+                color: Color.fromARGB(97, 112, 112, 112),
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(27, 55, 120, 1.0),
-
                     offset: Offset(0, 0), // Shadow position
                   ),
                 ],
@@ -3674,19 +3662,19 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     return Stack(
       children: <Widget>[
         InkWell(
-          // onTap: () => zoom_img(0),
           child: Container(
+            padding: EdgeInsets.all(6),
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.45,
+            height: MediaQuery.of(context).size.height * 0.2,
             child: Image.file(
               files_kam2[index]!,
             ),
           ),
         ),
         Positioned(
-          top: 5,
-          right: 5,
+          top: 8,
+          right: 8,
           child: InkWell(
             onTap: () {
               delete_img_kam2(index);
@@ -3697,7 +3685,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 borderRadius: BorderRadius.all(
                   Radius.circular(30),
                 ),
-                color: Colors.white38,
+                color: Color.fromARGB(97, 112, 112, 112),
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(27, 55, 120, 1.0),
@@ -3722,19 +3710,19 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     return Stack(
       children: <Widget>[
         InkWell(
-          // onTap: () => zoom_img(0),
           child: Container(
+            padding: EdgeInsets.all(6),
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.45,
+            height: MediaQuery.of(context).size.height * 0.2,
             child: Image.file(
               files_kam3[index]!,
             ),
           ),
         ),
         Positioned(
-          top: 5,
-          right: 5,
+          top: 8,
+          right: 8,
           child: InkWell(
             onTap: () {
               delete_img_kam3(index);
@@ -3745,7 +3733,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 borderRadius: BorderRadius.all(
                   Radius.circular(30),
                 ),
-                color: Colors.white38,
+                color: Color.fromARGB(97, 112, 112, 112),
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(27, 55, 120, 1.0),
@@ -3770,7 +3758,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
     return Stack(
       children: <Widget>[
         InkWell(
-          // onTap: () => zoom_img(0),
           child: Container(
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
@@ -3825,21 +3812,20 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 padding: const EdgeInsets.only(right: 10, top: 10),
                 child: Stack(
                   children: <Widget>[
-                    // Text("------------$i"),
                     InkWell(
-                      // onTap: () => zoom_img(0),
                       child: Container(
+                        padding: EdgeInsets.all(6),
                         decoration: new BoxDecoration(color: Colors.white),
                         alignment: Alignment.center,
-                        height: size * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.2,
                         child: Image.file(
                           files_more[i]!,
                         ),
                       ),
                     ),
                     Positioned(
-                      top: 5,
-                      right: 5,
+                      top: 8,
+                      right: 8,
                       child: InkWell(
                         onTap: () {
                           delete_img_more(i);
@@ -3850,7 +3836,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             borderRadius: BorderRadius.all(
                               Radius.circular(30),
                             ),
-                            color: Colors.white38,
+                            color: Color.fromARGB(97, 112, 112, 112),
                             boxShadow: [
                               BoxShadow(
                                 color: Color.fromRGBO(27, 55, 120, 1.0),

@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 
+
 List<ListMoreModal> listMoreModalFromJson(String str) =>
     List<ListMoreModal>.from(
         json.decode(str).map((x) => ListMoreModal.fromJson(x)));
@@ -37,7 +38,10 @@ class ListMoreModal {
             ? null
             : DateTime.parse(json["created_date"]),
         updateDate: json["update_date"],
+
+        
       );
+  
 
   Map<String, dynamic> toJson() => {
         "id_other": idOther == null ? null : idOther,

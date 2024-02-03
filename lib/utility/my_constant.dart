@@ -104,4 +104,10 @@ class MyConstant {
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
+  TextStyle textLoading() => const TextStyle(
+        fontSize: 16,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Prompt',
+      );
 }

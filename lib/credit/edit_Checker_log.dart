@@ -12,8 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
-import 'package:technician/models/customer_checker_logmodel.dart';
-import 'package:technician/models/list_more_modal.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/widgets/show_progress.dart';
@@ -49,7 +47,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   List<File?> files = [];
   File? file;
   File? file_more;
-  List<CustomerCheckerLogModel> data_customer = [];
+  List data_customer = [];
   Completer<GoogleMapController> _controller = Completer();
   bool show_kam1 = false;
   bool show_kam2 = false;
@@ -58,7 +56,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   bool show_more = false;
   List list_zone = [];
   List list_saka = [];
-  List<ListMoreModal> list_more = [];
+  List list_more = [];
   String? val_zone;
   String? val_saka;
   bool show_edit_zonesaka = false;
@@ -68,7 +66,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   String? prefixname_kam3_text;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     CheckPermission();
     _list_zone();
@@ -81,7 +78,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   }
 
   //CheckPermission
-  Future<Null> CheckPermission() async {
+  Future<void> CheckPermission() async {
     bool locationService;
     LocationPermission locationPermission;
 
@@ -147,7 +144,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   Future<Null> _list_zone() async {
     try {
       var respose = await http
-          .get(Uri.http(ipconfig_checker, '/checker_data/zone_mobile.php'));
+          .get(Uri.http(ipconfig_checker, '/CheckerData2/api/Zone.php'));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -155,8 +152,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         });
       }
     } catch (e) {
-      var respose = await http.get(
-          Uri.http(ipconfig_checker_office, '/checker_data/zone_mobile.php'));
+      var respose = await http
+          .get(Uri.http(ipconfig_checker_office, '/CheckerData2/api/Zone.php'));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -172,7 +169,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
     val_saka = null;
     try {
       var respose = await http.get(Uri.http(ipconfig_checker,
-          '/checker_data/saka_mobile.php', {"zone": zone.toString()}));
+          '/CheckerData2/api/Branch.php', {"zone": zone.toString()}));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -181,7 +178,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       }
     } catch (e) {
       var respose = await http.get(Uri.http(ipconfig_checker_office,
-          '/checker_data/saka_mobile.php', {"zone": zone.toString()}));
+          '/CheckerData2/api/Branch.php', {"zone": zone.toString()}));
       if (respose.statusCode == 200) {
         var jsonData = jsonDecode(respose.body);
         setState(() {
@@ -193,28 +190,35 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
 
   //list_more
   Future<Null> _list_more() async {
-    list_more = [];
     try {
-      var respose = await http
-          .get(Uri.http(ipconfig_checker, '/checker_data/list_more.php', {
+      var respose = await http.post(Uri.http(
+          ipconfig_checker, '/CheckerData2/api/DataShowEditImgMore.php', {
         "id_runing": widget.running_id.toString(),
         "type_runing": widget.type_running.toString(),
       }));
       if (respose.statusCode == 200) {
-        setState(() {
-          list_more = listMoreModalFromJson(respose.body);
-        });
+        var data = json.decode(respose.body);
+        if (data['status'] == 200) {
+          show_more = true;
+          setState(() {
+            list_more = data['data'];
+          });
+        }
       }
     } catch (e) {
-      var respose = await http.get(
-          Uri.http(ipconfig_checker_office, '/checker_data/list_more.php', {
+      var respose = await http.post(Uri.http(ipconfig_checker_office,
+          '/CheckerData2/api/DataShowEditImgMore.php', {
         "id_runing": widget.running_id.toString(),
         "type_runing": widget.type_running.toString(),
       }));
       if (respose.statusCode == 200) {
-        setState(() {
-          list_more = listMoreModalFromJson(respose.body);
-        });
+        var data = json.decode(respose.body);
+        if (data['status'] == 200) {
+          show_more = true;
+          setState(() {
+            list_more = data['data'];
+          });
+        }
       }
     }
   }
@@ -247,85 +251,122 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
     try {
       var respose = await http.get(
           // Uri.http(widget.ip_conn, '/checker_data/filter_runing_mobile.php', {
-          Uri.http("$ipconfig_checker",
-              '/checker_data/data_edit_checker_log_mobile.php', {
+          Uri.http("$ipconfig_checker", '/CheckerData2/api/DataShowEdit.php', {
         "id_user": id_user,
       }));
       if (respose.statusCode == 200) {
-        // print(respose.body);
         setState(() {
-          data_customer = customerCheckerLogModelFromJson(respose.body);
+          data_customer = json.decode(respose.body);
 
-          name_customer_text.text = data_customer[0].cusName.toString();
-          if (data_customer[0].cusPrefix != "") {
-            prefixname_customer_text = data_customer[0].cusPrefix.toString();
+          name_customer_text.text = data_customer[0]['cus_name'].toString();
+          if (data_customer[0]['cus_prefix'] != "") {
+            prefixname_customer_text =
+                data_customer[0]['cus_prefix'].toString();
           }
-          lastname_customer_text.text = data_customer[0].cusLastname.toString();
+          lastname_customer_text.text =
+              data_customer[0]['cus_lastname'].toString();
 
-          if (data_customer[0].kam1Name != "ไม่มี") {
+          if (data_customer[0]['G1_Fname'] != null) {
             show_kam1 = true;
-            name_kam1_text.text = data_customer[0].kam1Name.toString();
-            lastname_kam1_text.text = data_customer[0].kam1Lastname.toString();
-            if (data_customer[0].kam1Prefix != "") {
-              prefixname_kam1_text = data_customer[0].kam1Prefix;
+            data_customer[0]['G1_Fname'] == null
+                ? name_kam1_text.text = ''
+                : name_kam1_text.text = data_customer[0]['G1_Fname'].toString();
+            data_customer[0]['G1_Lname'] == null
+                ? lastname_kam1_text.text = ''
+                : lastname_kam1_text.text =
+                    data_customer[0]['G1_Lname'].toString();
+            if (data_customer[0]['G1_Prefix'] != "") {
+              prefixname_kam1_text = data_customer[0]['G1_Prefix'];
             }
           }
-          if (data_customer[0].kam2Name != "ไม่มี") {
+          if (data_customer[0]['G2_Fname'] != null) {
             show_kam2 = true;
-            name_kam2_text.text = data_customer[0].kam2Name.toString();
-            lastname_kam2_text.text = data_customer[0].kam2Lastname.toString();
-            if (data_customer[0].kam2Prefix != "") {
-              prefixname_kam2_text = data_customer[0].kam2Prefix;
+            data_customer[0]['G2_Fname'] == null
+                ? name_kam2_text.text = ''
+                : name_kam2_text.text = data_customer[0]['G2_Fname'].toString();
+            data_customer[0]['G2_Lname'] == null
+                ? lastname_kam2_text.text = ''
+                : lastname_kam2_text.text =
+                    data_customer[0]['G2_Lname'].toString();
+            if (data_customer[0]['G2_Prefix'] != "") {
+              prefixname_kam2_text = data_customer[0]['G2_Prefix'];
             }
           }
-          if (data_customer[0].kam3Name != "ไม่มี") {
+          if (data_customer[0]['G3_Fname'] != null) {
             show_kam3 = true;
-            name_kam3_text.text = data_customer[0].kam3Name.toString();
-            lastname_kam3_text.text = data_customer[0].kam3Lastname.toString();
-            if (data_customer[0].kam3Prefix != "") {
-              prefixname_kam3_text = data_customer[0].kam3Prefix;
+            data_customer[0]['G3_Fname'] == null
+                ? name_kam3_text.text = ''
+                : name_kam3_text.text = data_customer[0]['G3_Fname'].toString();
+            data_customer[0]['G3_Lname'] == null
+                ? lastname_kam3_text.text = ''
+                : lastname_kam3_text.text =
+                    data_customer[0]['G3_Lname'].toString();
+            if (data_customer[0]['G3_Prefix'] != "") {
+              prefixname_kam3_text = data_customer[0]['G3_Prefix'];
             }
           }
-          if (data_customer[0].reportEtcImg != "ไม่มี") {
+          if (data_customer[0]['report_etc_img'] != "") {
             show_other = true;
           }
         });
       }
     } catch (e) {
-      var respose = await http.get(
-          // Uri.http(widget.ip_conn, '/checker_data/filter_runing_mobile.php', {
-          Uri.http("$ipconfig_checker_office",
-              '/checker_data/data_edit_checker_log_mobile.php', {
+      var respose = await http.get(Uri.http(
+          "$ipconfig_checker_office", '/CheckerData2/api/DataShowEdit.php', {
         "id_user": id_user,
       }));
       if (respose.statusCode == 200) {
-        // print(respose.body);
         setState(() {
-          data_customer = customerCheckerLogModelFromJson(respose.body);
+          data_customer = json.decode(respose.body);
 
-          name_customer_text.text = data_customer[0].cusName.toString();
-          prefixname_customer_text = data_customer[0].cusPrefix.toString();
-          lastname_customer_text.text = data_customer[0].cusLastname.toString();
+          name_customer_text.text = data_customer[0]['cus_name'].toString();
+          if (data_customer[0]['cus_prefix'] != "") {
+            prefixname_customer_text =
+                data_customer[0]['cus_prefix'].toString();
+          }
+          lastname_customer_text.text =
+              data_customer[0]['cus_lastname'].toString();
 
-          if (data_customer[0].kam1Name != "ไม่มี") {
+          if (data_customer[0]['G1_Fname'] != null) {
             show_kam1 = true;
-            name_kam1_text.text = data_customer[0].kam1Name.toString();
-            lastname_kam1_text.text = data_customer[0].kam1Lastname.toString();
-            prefixname_kam1_text = data_customer[0].kam1Prefix;
+            data_customer[0]['G1_Fname'] == null
+                ? name_kam1_text.text = ''
+                : name_kam1_text.text = data_customer[0]['G1_Fname'].toString();
+            data_customer[0]['G1_Lname'] == null
+                ? lastname_kam1_text.text = ''
+                : lastname_kam1_text.text =
+                    data_customer[0]['G1_Lname'].toString();
+            if (data_customer[0]['G1_Prefix'] != "") {
+              prefixname_kam1_text = data_customer[0]['G1_Prefix'];
+            }
           }
-          if (data_customer[0].kam2Name != "ไม่มี") {
+          if (data_customer[0]['G2_Fname'] != null) {
             show_kam2 = true;
-            name_kam2_text.text = data_customer[0].kam2Name.toString();
-            lastname_kam2_text.text = data_customer[0].kam2Lastname.toString();
-            prefixname_kam2_text = data_customer[0].kam2Prefix;
+            data_customer[0]['G2_Fname'] == null
+                ? name_kam2_text.text = ''
+                : name_kam2_text.text = data_customer[0]['G2_Fname'].toString();
+            data_customer[0]['G2_Lname'] == null
+                ? lastname_kam2_text.text = ''
+                : lastname_kam2_text.text =
+                    data_customer[0]['G2_Lname'].toString();
+            if (data_customer[0]['G2_Prefix'] != "") {
+              prefixname_kam2_text = data_customer[0]['G2_Prefix'];
+            }
           }
-          if (data_customer[0].kam3Name != "ไม่มี") {
+          if (data_customer[0]['G3_Fname'] != null) {
             show_kam3 = true;
-            name_kam3_text.text = data_customer[0].kam3Name.toString();
-            lastname_kam3_text.text = data_customer[0].kam3Lastname.toString();
-            prefixname_kam3_text = data_customer[0].kam3Prefix;
+            data_customer[0]['G3_Fname'] == null
+                ? name_kam3_text.text = ''
+                : name_kam3_text.text = data_customer[0]['G3_Fname'].toString();
+            data_customer[0]['G3_Lname'] == null
+                ? lastname_kam3_text.text = ''
+                : lastname_kam3_text.text =
+                    data_customer[0]['G3_Lname'].toString();
+            if (data_customer[0]['G3_Prefix'] != "") {
+              prefixname_kam3_text = data_customer[0]['G3_Prefix'];
+            }
           }
-          if (data_customer[0].reportEtcImg != "ไม่มี") {
+          if (data_customer[0]['report_etc_img'] != "") {
             show_other = true;
           }
         });
@@ -337,13 +378,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   Future change_name_api(prefix, name, lastname, type) async {
     try {
       var uri = Uri.parse(
-          "http://$ipconfig_checker/checker_data/changename_checker_log_mobile_v2.php");
+          "http://$ipconfig_checker/CheckerData2/api/UpdateNameCustomer.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['name'] = name;
       request.fields['lastname'] = lastname;
       request.fields['prefix'] = prefix;
       request.fields['type'] = type.toString();
       request.fields['id_user'] = widget.id_user!;
+      request.fields['running_id'] = widget.running_id!;
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
@@ -354,13 +396,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       }
     } catch (e) {
       var uri = Uri.parse(
-          "http://$ipconfig_checker_office/checker_data/changename_checker_log_mobile_v2.php");
+          "http://$ipconfig_checker_office/CheckerData2/api/UpdateNameCustomer.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['name'] = name;
       request.fields['lastname'] = lastname;
       request.fields['prefix'] = prefix;
       request.fields['type'] = type.toString();
       request.fields['id_user'] = widget.id_user!;
+      request.fields['running_id'] = widget.running_id!;
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
@@ -427,13 +470,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_customer(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 800,
         maxHeight: 800,
@@ -525,7 +568,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker$i.jpg';
       String api_upload_img_customer =
-          'http://$ipconfig_checker/checker_data/edit_customer_mobile.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&name=$name&id_user=${widget.id_user}&index=$index';
+          'http://$ipconfig_checker/CheckerData2/api/UpdateImgCusGuran.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&name=$name&id_user=${widget.id_user}&index=$index';
       Map<String, dynamic> map_customer = {};
       map_customer['file'] =
           await MultipartFile.fromFile(files[index]!.path, filename: nameFile);
@@ -534,14 +577,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           .post(api_upload_img_customer, data: data_customer)
           .then((value) {
         successDialog(context, "สำเร็จ", "แก้ไขภาพเสร็จสิ้น");
-        // Navigator.pop(context);
-        // print("---------------- success upload ----------------------");
       });
     } catch (e) {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker$i.jpg';
       String api_upload_img_customer =
-          'http://$ipconfig_checker_office/checker_data/edit_customer_mobile.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&name=$name&id_user=${widget.id_user}&index=$index';
+          'http://$ipconfig_checker_office/CheckerData2/api/UpdateImgCusGuran.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&name=$name&id_user=${widget.id_user}&index=$index';
       Map<String, dynamic> map_customer = {};
       map_customer['file'] =
           await MultipartFile.fromFile(files[index]!.path, filename: nameFile);
@@ -550,8 +591,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           .post(api_upload_img_customer, data: data_customer)
           .then((value) {
         successDialog(context, "สำเร็จ", "แก้ไขภาพเสร็จสิ้น");
-        // Navigator.pop(context);
-        // print("---------------- success upload ----------------------");
       });
     }
   }
@@ -561,7 +600,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   Future<Null> change_zonesaka(zone, saka) async {
     try {
       var uri = Uri.parse(
-          "http://$ipconfig_checker/checker_data/change_zone_saka_mobile.php");
+          "http://$ipconfig_checker/CheckerData2/api/UpdateZoneCountry.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['zone'] = zone;
       request.fields['saka'] = saka;
@@ -579,7 +618,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       }
     } catch (e) {
       var uri = Uri.parse(
-          "http://$ipconfig_checker_office/checker_data/change_zone_saka_mobile.php");
+          "http://$ipconfig_checker_office/CheckerData2/api/UpdateZoneCountry.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['zone'] = zone;
       request.fields['saka'] = saka;
@@ -678,6 +717,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         });
       }
     }
+    if (type == 5) {
+      if (show_more == false) {
+        setState(() {
+          show_more = true;
+        });
+      } else {
+        setState(() {
+          show_more = false;
+        });
+      }
+    }
   }
 
   //แสดงแผนที่
@@ -689,7 +739,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          clipBehavior: Clip.none, alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -742,7 +793,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   Future change_map_api(lat, lng) async {
     try {
       var uri = Uri.parse(
-          "http://$ipconfig_checker/checker_data/changemap_checker_log_mobile.php");
+          "http://$ipconfig_checker/CheckerData2/api/UpdateGoogleMap.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['lat'] = lat.toString();
       request.fields['lng'] = lng.toString();
@@ -757,7 +808,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       }
     } catch (e) {
       var uri = Uri.parse(
-          "http://$ipconfig_checker_office/checker_data/changemap_checker_log_mobile.php");
+          "http://$ipconfig_checker_office/CheckerData2/api/UpdateGoogleMap.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['lat'] = lat.toString();
       request.fields['lng'] = lng.toString();
@@ -815,7 +866,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             children: [
               FadeInImage.assetNetwork(
                   placeholder: 'images/load_img.gif',
-                  image: 'http://${widget.ip_conn}/checker_data/$url'),
+                  image: 'http://${widget.ip_conn}/CheckerData2/$url'),
             ],
           ),
         ],
@@ -826,7 +877,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   Future<Null> delete_img_more(id_more) async {
     try {
       var uri = Uri.parse(
-          "http://$ipconfig_checker/checker_data/delete_img_more.php");
+          "http://$ipconfig_checker/CheckerData2/api/DeleteImgMore.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['id_more'] = id_more.toString();
       var response = await request.send();
@@ -838,7 +889,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       _list_more();
     } catch (e) {
       var uri = Uri.parse(
-          "http://$ipconfig_checker_office/checker_data/delete_img_more.php");
+          "http://$ipconfig_checker_office/CheckerData2/api/DeleteImgMore.php");
       var request = new http.MultipartRequest("POST", uri);
       request.fields['id_more'] = id_more.toString();
       var response = await request.send();
@@ -906,13 +957,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   Future<Null> process_img_more(ImageSource source) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 1080,
         maxHeight: 1920,
@@ -929,7 +980,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker_more$i.jpg';
       String api_upload_img_more =
-          'http://$ipconfig_checker/checker_data/uploadimage_more_mobile.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
+          'http://$ipconfig_checker/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
       Map<String, dynamic> map_more = {};
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
@@ -943,7 +994,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker_more$i.jpg';
       String api_upload_img_more =
-          'http://$ipconfig_checker_office/checker_data/uploadimage_more_mobile.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
+          'http://$ipconfig_checker_office/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
       Map<String, dynamic> map_more = {};
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
@@ -1003,7 +1054,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ],
                       SizedBox(height: 10),
                       input_more(size),
-                      SizedBox(height: 10),
+                      SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -1021,7 +1072,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(bottom: 10.0),
+              margin: EdgeInsets.only(bottom: 15.0),
               child: Column(
                 children: [
                   Container(
@@ -1056,16 +1107,20 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                               : 6,
                           enabled: false,
                           decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
                             prefixIcon: Icon(Icons.confirmation_number),
+                            suffixIcon: Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: size * 0.06,
+                            ),
                             labelText: "เลขรันนิ่งสัญญา",
                             labelStyle: MyConstant().normalStyle(),
                           ),
                         ),
-                      ),
-                      Icon(
-                        Icons.check,
-                        color: Colors.green,
-                        size: size * 0.06,
                       ),
                     ],
                   ),
@@ -1143,50 +1198,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                 ),
               ),
             ],
-            // Container(
-            //   margin: EdgeInsets.only(bottom: 10.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //     children: [
-            //       Column(
-            //         children: [
-            //           Row(
-            //             children: [
-            //               Icon(
-            //                 Icons.location_history,
-            //                 color: Color.fromRGBO(27, 55, 120, 1.0),
-            //                 size: size * 0.06,
-            //               ),
-            //               SizedBox(width: 10),
-            //               Text(
-            //                 "เขต : ${widget.zone}",
-            //                 style: MyConstant().h3Style(),
-            //               ),
-            //             ],
-            //           )
-            //         ],
-            //       ),
-            //       Column(
-            //         children: [
-            //           Row(
-            //             children: [
-            //               Icon(
-            //                 Icons.location_city_rounded,
-            //                 color: Color.fromRGBO(27, 55, 120, 1.0),
-            //                 size: size * 0.06,
-            //               ),
-            //               SizedBox(width: 10),
-            //               Text(
-            //                 "สาขา : ${widget.saka}",
-            //                 style: MyConstant().h3Style(),
-            //               ),
-            //             ],
-            //           )
-            //         ],
-            //       ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       );
@@ -1303,6 +1314,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                           value: prefixname_customer_text,
                           icon: const Icon(Icons.arrow_drop_down),
                           elevation: 16,
+                          decoration: InputDecoration(
+                            errorStyle: TextStyle(fontSize: 12),
+                            contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                          ),
                           style: const TextStyle(color: Colors.deepPurple),
                           hint: Text(
                             "คำนำหน้าชื่อ",
@@ -1332,6 +1350,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       )
                     ],
                   ),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1345,7 +1364,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             return null;
                           },
                           decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            errorStyle: TextStyle(fontSize: 12),
                             prefixIcon: Icon(Icons.location_history),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
                             labelText: "ชื่อ",
                             labelStyle: MyConstant().normalStyle(),
                           ),
@@ -1353,6 +1377,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1366,7 +1391,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             return null;
                           },
                           decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            errorStyle: TextStyle(fontSize: 12),
                             prefixIcon: Icon(Icons.location_history),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
                             labelText: "นามสกุล",
                             labelStyle: MyConstant().normalStyle(),
                           ),
@@ -1377,7 +1407,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (data_customer[0].status != "ตรวจสอบสัญญาเรียบร้อย" ||
+                      if (data_customer[0]['status'] !=
+                              "ตรวจสอบสัญญาเรียบร้อย" ||
                           widget.level == "checker_runnig") ...[
                         TextButton(
                           style: TextButton.styleFrom(
@@ -1420,12 +1451,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
                         onTap: () {
-                          if (data_customer[0].status !=
+                          if (data_customer[0]['status'] !=
                                   "ตรวจสอบสัญญาเรียบร้อย" ||
                               widget.level == "checker_runnig") {
                             img_customer("รูปบัตรประชาชน", 0);
@@ -1435,12 +1467,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                           if (files[0] != null) {
                             zoom_img(files, 0);
                           } else {
-                            zoom_img_old(data_customer[0].cusCardIdImg);
+                            zoom_img_old(data_customer[0]['cus_card_id_img']);
                           }
                         },
                         child: files[0] == null
-                            ? show_imgold(
-                                size, data_customer[0].cusCardIdImg, ipconfig)
+                            ? show_imgold(size,
+                                data_customer[0]['cus_card_id_img'], ipconfig)
                             : show_imgCustomer(size, 0),
                       ),
                     ],
@@ -1467,12 +1499,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
                         onTap: () {
-                          if (data_customer[0].status !=
+                          if (data_customer[0]['status'] !=
                                   "ตรวจสอบสัญญาเรียบร้อย" ||
                               widget.level == "checker_runnig") {
                             img_customer("แผนที่บ้าน", 1);
@@ -1482,12 +1515,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                           if (files[1] != null) {
                             zoom_img(files, 1);
                           } else {
-                            zoom_img_old(data_customer[0].cusMapsImg);
+                            zoom_img_old(data_customer[0]['cus_maps_img']);
                           }
                         },
                         child: files[1] == null
-                            ? show_imgold(
-                                size, data_customer[0].cusMapsImg, ipconfig)
+                            ? show_imgold(size,
+                                data_customer[0]['cus_maps_img'], ipconfig)
                             : show_imgCustomer(size, 1),
                       ),
                     ],
@@ -1514,12 +1547,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
                         onTap: () {
-                          if (data_customer[0].status !=
+                          if (data_customer[0]['status'] !=
                                   "ตรวจสอบสัญญาเรียบร้อย" ||
                               widget.level == "checker_runnig") {
                             img_customer("รูปบ้าน", 2);
@@ -1529,12 +1563,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                           if (files[2] != null) {
                             zoom_img(files, 2);
                           } else {
-                            zoom_img_old(data_customer[0].cusAddressImg);
+                            zoom_img_old(data_customer[0]['cus_address_img']);
                           }
                         },
                         child: files[2] == null
-                            ? show_imgold(
-                                size, data_customer[0].cusAddressImg, ipconfig)
+                            ? show_imgold(size,
+                                data_customer[0]['cus_address_img'], ipconfig)
                             : show_imgCustomer(size, 2),
                       ),
                     ],
@@ -1561,12 +1595,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
                         onTap: () {
-                          if (data_customer[0].status !=
+                          if (data_customer[0]['status'] !=
                                   "ตรวจสอบสัญญาเรียบร้อย" ||
                               widget.level == "checker_runnig") {
                             img_customer("รูปตอนเซ็น", 3);
@@ -1576,16 +1611,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                           if (files[3] != null) {
                             zoom_img(files, 3);
                           } else {
-                            zoom_img_old(data_customer[0].cusLicenImg);
+                            zoom_img_old(data_customer[0]['cus_licen_img']);
                           }
                         },
                         child: files[3] == null
-                            ? show_imgold(
-                                size, data_customer[0].cusLicenImg, ipconfig)
+                            ? show_imgold(size,
+                                data_customer[0]['cus_licen_img'], ipconfig)
                             : show_imgCustomer(size, 3),
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
                 ],
               ),
             ),
@@ -1615,19 +1651,22 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         InkWell(
                           onTap: () {
                             img_customer(
-                                "หน้าสัญญา${data_customer[0].cusContractImg}",
+                                "หน้าสัญญา${data_customer[0]['cus_contract_img']}",
                                 16);
                           },
                           onLongPress: () {
                             if (files[16] != null) {
                               zoom_img(files, 16);
                             } else {
-                              zoom_img_old(data_customer[0].cusContractImg);
+                              zoom_img_old(
+                                  data_customer[0]['cus_contract_img']);
                             }
                           },
                           child: files[16] == null
-                              ? show_imgold(size,
-                                  data_customer[0].cusContractImg, ipconfig)
+                              ? show_imgold(
+                                  size,
+                                  data_customer[0]['cus_contract_img'],
+                                  ipconfig)
                               : show_imgCustomer(size, 16),
                         ),
                       ],
@@ -1665,12 +1704,15 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[17] != null) {
                               zoom_img(files, 17);
                             } else {
-                              zoom_img_old(data_customer[0].cusPurchaseImg);
+                              zoom_img_old(
+                                  data_customer[0]['cus_purchase_img']);
                             }
                           },
                           child: files[17] == null
-                              ? show_imgold(size,
-                                  data_customer[0].cusPurchaseImg, ipconfig)
+                              ? show_imgold(
+                                  size,
+                                  data_customer[0]['cus_purchase_img'],
+                                  ipconfig)
                               : show_imgCustomer(size, 17),
                         ),
                       ],
@@ -1708,12 +1750,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[18] != null) {
                               zoom_img(files, 18);
                             } else {
-                              zoom_img_old(data_customer[0].cusOfferImg);
+                              zoom_img_old(data_customer[0]['cus_offer_img']);
                             }
                           },
                           child: files[18] == null
-                              ? show_imgold(
-                                  size, data_customer[0].cusOfferImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['cus_offer_img'], ipconfig)
                               : show_imgCustomer(size, 18),
                         ),
                       ],
@@ -1802,6 +1844,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             value: prefixname_kam1_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -1826,6 +1875,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -1833,14 +1883,20 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam1_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "ชื่อ ผู้้ค้ำ 1",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "ชื่อ ผู้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
                         ),
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -1848,8 +1904,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam1_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "นามสกุล ผู้้ค้ำ 1",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "นามสกุล ผู้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
@@ -1859,7 +1920,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (data_customer[0].status !=
+                        if (data_customer[0]['status'] !=
                                 "ตรวจสอบสัญญาเรียบร้อย" ||
                             widget.level == "checker_runnig") ...[
                           TextButton(
@@ -1898,17 +1959,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบัตรประชาชน", 4);
@@ -1918,12 +1980,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[4] != null) {
                               zoom_img(files, 4);
                             } else {
-                              zoom_img_old(data_customer[0].kam1CardIdImg);
+                              zoom_img_old(data_customer[0]['G1_IdcardImg']);
                             }
                           },
                           child: files[4] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam1CardIdImg, ipconfig)
+                                  data_customer[0]['G1_IdcardImg'], ipconfig)
                               : show_imgCustomer(size, 4),
                         ),
                       ],
@@ -1945,17 +2007,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("แผนที่บ้าน", 5);
@@ -1965,12 +2028,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[5] != null) {
                               zoom_img(files, 5);
                             } else {
-                              zoom_img_old(data_customer[0].kam1MapsImg);
+                              zoom_img_old(data_customer[0]['G1_MapImg']);
                             }
                           },
                           child: files[5] == null
                               ? show_imgold(
-                                  size, data_customer[0].kam1MapsImg, ipconfig)
+                                  size, data_customer[0]['G1_MapImg'], ipconfig)
                               : show_imgCustomer(size, 5),
                         ),
                       ],
@@ -1992,17 +2055,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบ้าน", 6);
@@ -2012,12 +2076,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[6] != null) {
                               zoom_img(files, 6);
                             } else {
-                              zoom_img_old(data_customer[0].kam1AddressImg);
+                              zoom_img_old(data_customer[0]['G1_HouseImg']);
                             }
                           },
                           child: files[6] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam1AddressImg, ipconfig)
+                                  data_customer[0]['G1_HouseImg'], ipconfig)
                               : show_imgCustomer(size, 6),
                         ),
                       ],
@@ -2039,17 +2103,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปตอนเซ็น",
+                          "รูปตอนเซ็น (ผู้ค้ำ 1)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปตอนเซ็น", 7);
@@ -2059,16 +2124,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[7] != null) {
                               zoom_img(files, 7);
                             } else {
-                              zoom_img_old(data_customer[0].kam1LicenImg);
+                              zoom_img_old(data_customer[0]['G1_PactImg']);
                             }
                           },
                           child: files[7] == null
-                              ? show_imgold(
-                                  size, data_customer[0].kam1LicenImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['G1_PactImg'], ipconfig)
                               : show_imgCustomer(size, 7),
                         ),
                       ],
                     ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -2153,6 +2219,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             value: prefixname_kam2_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -2177,6 +2250,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -2184,14 +2258,20 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam2_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "ชื่อ ผู้้ค้ำ 2",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "ชื่อ ผู้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
                         ),
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -2199,8 +2279,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam2_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "นามสกุล ผู้้ค้ำ 2",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "นามสกุล ผู้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
@@ -2210,7 +2295,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (data_customer[0].status !=
+                        if (data_customer[0]['status'] !=
                                 "ตรวจสอบสัญญาเรียบร้อย" ||
                             widget.level == "checker_runnig") ...[
                           TextButton(
@@ -2249,17 +2334,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบัตรประชาชน", 8);
@@ -2269,12 +2355,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[8] != null) {
                               zoom_img(files, 8);
                             } else {
-                              zoom_img_old(data_customer[0].kam2CardIdImg);
+                              zoom_img_old(data_customer[0]['G2_IdcardImg']);
                             }
                           },
                           child: files[8] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam2CardIdImg, ipconfig)
+                                  data_customer[0]['G2_IdcardImg'], ipconfig)
                               : show_imgCustomer(size, 8),
                         ),
                       ],
@@ -2296,17 +2382,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("แผนที่บ้าน", 9);
@@ -2316,12 +2403,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[9] != null) {
                               zoom_img(files, 9);
                             } else {
-                              zoom_img_old(data_customer[0].kam2MapsImg);
+                              zoom_img_old(data_customer[0]['G2_MapImg']);
                             }
                           },
                           child: files[9] == null
                               ? show_imgold(
-                                  size, data_customer[0].kam2MapsImg, ipconfig)
+                                  size, data_customer[0]['G2_MapImg'], ipconfig)
                               : show_imgCustomer(size, 9),
                         ),
                       ],
@@ -2343,17 +2430,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบ้าน", 10);
@@ -2363,12 +2451,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[10] != null) {
                               zoom_img(files, 10);
                             } else {
-                              zoom_img_old(data_customer[0].kam2AddressImg);
+                              zoom_img_old(data_customer[0]['G2_HouseImg']);
                             }
                           },
                           child: files[10] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam2AddressImg, ipconfig)
+                                  data_customer[0]['G2_HouseImg'], ipconfig)
                               : show_imgCustomer(size, 10),
                         ),
                       ],
@@ -2390,17 +2478,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปตอนเซ็น",
+                          "รูปตอนเซ็น (ผู้ค้ำ 2)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปตอนเซ็น", 11);
@@ -2410,16 +2499,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[11] != null) {
                               zoom_img(files, 11);
                             } else {
-                              zoom_img_old(data_customer[0].kam2LicenImg);
+                              zoom_img_old(data_customer[0]['G2_PactImg']);
                             }
                           },
                           child: files[11] == null
-                              ? show_imgold(
-                                  size, data_customer[0].kam2LicenImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['G2_PactImg'], ipconfig)
                               : show_imgCustomer(size, 11),
                         ),
                       ],
                     ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -2504,6 +2594,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             value: prefixname_kam3_text,
                             icon: const Icon(Icons.arrow_drop_down),
                             elevation: 16,
+                            decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
                               "คำนำหน้าชื่อ",
@@ -2528,6 +2625,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         )
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -2535,14 +2633,20 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam3_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "ชื่อ ผู้้ค้ำ 3",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "ชื่อ ผู้ค้ำ 3",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
                         ),
                       ],
                     ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -2550,8 +2654,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: lastname_kam3_text,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                              errorStyle: TextStyle(fontSize: 12),
                               prefixIcon: Icon(Icons.location_history),
-                              labelText: "นามสกุล ผู้้ค้ำ 3",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              labelText: "นามสกุล ผู้ค้ำ 3",
                               labelStyle: MyConstant().normalStyle(),
                             ),
                           ),
@@ -2561,7 +2670,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (data_customer[0].status !=
+                        if (data_customer[0]['status'] !=
                                 "ตรวจสอบสัญญาเรียบร้อย" ||
                             widget.level == "checker_runnig") ...[
                           TextButton(
@@ -2600,17 +2709,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบัตรประชาชน",
+                          "รูปบัตรประชาชน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบัตรประชาชน", 12);
@@ -2620,12 +2730,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[12] != null) {
                               zoom_img(files, 12);
                             } else {
-                              zoom_img_old(data_customer[0].kam3CardIdImg);
+                              zoom_img_old(data_customer[0]['G3_IdcardImg']);
                             }
                           },
                           child: files[12] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam3CardIdImg, ipconfig)
+                                  data_customer[0]['G3_IdcardImg'], ipconfig)
                               : show_imgCustomer(size, 12),
                         ),
                       ],
@@ -2647,17 +2757,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "แผนที่บ้าน",
+                          "แผนที่บ้าน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("แผนที่บ้าน", 13);
@@ -2667,12 +2778,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[13] != null) {
                               zoom_img(files, 13);
                             } else {
-                              zoom_img_old(data_customer[0].kam3MapsImg);
+                              zoom_img_old(data_customer[0]['G3_MapImg']);
                             }
                           },
                           child: files[13] == null
                               ? show_imgold(
-                                  size, data_customer[0].kam3MapsImg, ipconfig)
+                                  size, data_customer[0]['G3_MapImg'], ipconfig)
                               : show_imgCustomer(size, 13),
                         ),
                       ],
@@ -2694,17 +2805,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปบ้าน",
+                          "รูปบ้าน (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปบ้าน", 14);
@@ -2714,12 +2826,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[14] != null) {
                               zoom_img(files, 14);
                             } else {
-                              zoom_img_old(data_customer[0].kam3AddressImg);
+                              zoom_img_old(data_customer[0]['G3_HouseImg']);
                             }
                           },
                           child: files[14] == null
                               ? show_imgold(size,
-                                  data_customer[0].kam3AddressImg, ipconfig)
+                                  data_customer[0]['G3_HouseImg'], ipconfig)
                               : show_imgCustomer(size, 14),
                         ),
                       ],
@@ -2741,17 +2853,18 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "รูปตอนเซ็น",
+                          "รูปตอนเซ็น (ผู้ค้ำ 3)",
                           style: MyConstant().h3Style(),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
-                            if (data_customer[0].status !=
+                            if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
                               img_customer("รูปตอนเซ็น", 15);
@@ -2761,16 +2874,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (files[15] != null) {
                               zoom_img(files, 15);
                             } else {
-                              zoom_img_old(data_customer[0].kam3LicenImg);
+                              zoom_img_old(data_customer[0]['G3_PactImg']);
                             }
                           },
                           child: files[15] == null
-                              ? show_imgold(
-                                  size, data_customer[0].kam3LicenImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['G3_PactImg'], ipconfig)
                               : show_imgCustomer(size, 15),
                         ),
                       ],
                     ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -2871,8 +2985,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             img_customer("ใบรายงาน", 19);
                           },
                           child: files[19] == null
-                              ? show_imgold(
-                                  size, data_customer[0].reportEtcImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['report_etc_img'], ipconfig)
                               : show_imgCustomer(size, 19),
                         ),
                       ],
@@ -2907,8 +3021,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             img_customer("สัญญาหน้าหลังสุด(ลายเซ็นคนค้ำ)", 20);
                           },
                           child: files[20] == null
-                              ? show_imgold(
-                                  size, data_customer[0].licenEtcImg, ipconfig)
+                              ? show_imgold(size,
+                                  data_customer[0]['licen_etc_img'], ipconfig)
                               : show_imgCustomer(size, 20),
                         ),
                       ],
@@ -2987,7 +3101,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             ),
             if (show_more == true) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 10.0),
+                margin: EdgeInsets.only(bottom: 40.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -3005,11 +3119,21 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                       ],
                     ),
+                    if (list_more.length > 0) ...[
+                      SizedBox(width: 10),
+                      Row(
+                        children: [
+                          Text(
+                            '*ภาพเพิ่มเติมมี ${list_more.length} ภาพ',
+                            style: MyConstant().h3Style(),
+                          ),
+                        ],
+                      ),
+                    ],
                     Column(
                       children: [
-                        // if (index_more > 0) ...[
                         show_imgmore(size),
-                        // ],
+                        SizedBox(height: 20),
                         InkWell(
                           onTap: () {
                             img_more("ภาพเพิ่มเติม");
@@ -3144,7 +3268,10 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   }
 
   Container show_imgold(size, img, ipconn) {
-    if (img == "ไม่มี" || img == "" || img == "ยังไม่ได้ส่งหมอบ") {
+    if (img == "ไม่มี" ||
+        img == "" ||
+        img == "ยังไม่ได้ส่งหมอบ" ||
+        img == null) {
       return Container(
           child: Icon(
         Icons.add_photo_alternate_sharp,
@@ -3155,10 +3282,10 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       return Container(
         decoration: new BoxDecoration(color: Colors.white),
         alignment: Alignment.center,
-        height: size * 0.45,
+        height: size * 0.40,
         child: FadeInImage.assetNetwork(
             placeholder: 'images/load_img.gif',
-            image: 'http://${widget.ip_conn}/checker_data/$img'),
+            image: 'http://${widget.ip_conn}/CheckerData2/$img'),
         // child: Image.network('http://${widget.ip_conn}/checker_data/$img'),
       );
     }
@@ -3171,7 +3298,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           child: Container(
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.45,
+            height: size * 0.40,
             child: Image.file(
               files[index]!,
             ),
@@ -3187,57 +3314,59 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            for (int i = 0; i < list_more.length; i++) ...[
-              Padding(
-                padding: const EdgeInsets.only(right: 10, top: 10),
-                child: Stack(
-                  children: <Widget>[
-                    // Text("------------$i"),
-                    InkWell(
-                      // onTap: () => zoom_img(0),
-                      child: Container(
-                        decoration: new BoxDecoration(color: Colors.white),
-                        alignment: Alignment.center,
-                        height: size * 0.45,
-                        child: FadeInImage.assetNetwork(
-                            placeholder: 'images/load_img.gif',
-                            image:
-                                'http://${widget.ip_conn}/checker_data/${list_more[i].nameImg}'),
-                      ),
-                    ),
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: InkWell(
-                        onTap: () {
-                          delete_img_more(list_more[i].idOther);
-                        },
+            if (list_more.isNotEmpty) ...[
+              for (var i = 0; i < list_more.length; i++) ...[
+                Padding(
+                  padding: const EdgeInsets.only(right: 10, top: 10),
+                  child: Stack(
+                    children: <Widget>[
+                      // Text("------------$i"),
+                      InkWell(
+                        // onTap: () => zoom_img(0),
                         child: Container(
-                          padding: EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(30),
-                            ),
-                            color: Colors.white38,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color.fromRGBO(27, 55, 120, 1.0),
-
-                                offset: Offset(0, 0), // Shadow position
+                          decoration: new BoxDecoration(color: Colors.white),
+                          alignment: Alignment.center,
+                          height: size * 0.45,
+                          child: FadeInImage.assetNetwork(
+                              placeholder: 'images/load_img.gif',
+                              image:
+                                  'http://${widget.ip_conn}/CheckerData2/${list_more[i]['name_img']}'),
+                        ),
+                      ),
+                      Positioned(
+                        top: 5,
+                        right: 5,
+                        child: InkWell(
+                          onTap: () {
+                            delete_img_more(list_more[i]['id_other']);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(30),
                               ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 18,
+                              color: Colors.white38,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromRGBO(27, 55, 120, 1.0),
+
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ],
           ],
         ),

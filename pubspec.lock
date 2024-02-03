@@ -424,6 +424,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.5"
+  loading_gifs:
+    dependency: "direct main"
+    description:
+      name: loading_gifs
+      sha256: d3034b73c492ac5b5aaab7cb5a62b0c0f9f44342715f46b4ba0dbf50daead11c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   matcher:
     dependency: transitive
     description:
