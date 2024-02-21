@@ -14,7 +14,6 @@ import 'package:technician/models/job_log_history.dart';
 import 'package:technician/models/product_job.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class jobHistory extends StatefulWidget {
   final String id_staff;

@@ -15,7 +15,6 @@ import 'package:technician/models/show_user_data_job.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class show_data_job extends StatefulWidget {
   final idjob, idjobgen, idstaff;

@@ -11,7 +11,6 @@ import 'package:technician/sale/adduser.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/sale/job_history.dart';
 import 'package:technician/sale/log_adduser.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_profile.dart';
 import 'package:technician/widgets/show_signout.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/profile_setting.dart';
 import 'package:technician/utility/my_constant.dart';
 

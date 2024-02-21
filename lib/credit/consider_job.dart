@@ -16,7 +16,6 @@ import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class consider_job extends StatefulWidget {
   final idjob, idjobgen, idstaff;

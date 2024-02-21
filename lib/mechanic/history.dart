@@ -24,7 +24,6 @@ import 'package:technician/widgets/show_progress.dart';
 import 'package:technician/widgets/show_signout.dart';
 import 'package:technician/widgets/show_version.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class History extends StatefulWidget {
   final namestaff;
@@ -824,8 +823,7 @@ class _HistoryState extends State<History> {
                               style: TextStyle(
                                 fontFamily: 'Prompt',
                                 color: Colors.white,
-                                fontSize:
-                                    ResponsiveFlutter.of(context).fontSize(1.7),
+                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -853,8 +851,7 @@ class _HistoryState extends State<History> {
                               style: TextStyle(
                                 fontFamily: 'Prompt',
                                 color: Colors.white,
-                                fontSize:
-                                    ResponsiveFlutter.of(context).fontSize(1.7),
+                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -873,8 +870,7 @@ class _HistoryState extends State<History> {
                           style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'Prompt',
-                            fontSize:
-                                ResponsiveFlutter.of(context).fontSize(2.0),
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -883,8 +879,7 @@ class _HistoryState extends State<History> {
                           style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'Prompt',
-                            fontSize:
-                                ResponsiveFlutter.of(context).fontSize(2.0),
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/models/detail_mechanicmodel.dart';
@@ -303,7 +302,7 @@ class _DetailMechanicState extends State<DetailMechanic> {
                         ),
                       ),
                       width: MediaQuery.of(context).size.width * 0.8,
-                      child: SearchableDropdown.single(
+                      child: DropdownButton(
                         hint: Text(
                           "ชื่อช่างติดตั้ง",
                           style: MyConstant().h3Style(),
@@ -323,7 +322,7 @@ class _DetailMechanicState extends State<DetailMechanic> {
                         onChanged: (value) async {
                           if (value != null) {
                             setState(() {
-                              selectedValue_mec = value[0].toString();
+                              selectedValue_mec = value.toString();
                             });
                           } else {
                             selectedValue_mec = value.toString();

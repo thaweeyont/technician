@@ -6,11 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
@@ -228,7 +226,8 @@ class _AddlocationState extends State<Addlocation> {
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          clipBehavior: Clip.none, alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -328,8 +327,7 @@ class _AddlocationState extends State<Addlocation> {
                                     "เพิ่มสถานที่ติดตั้งสินค้า",
                                     style: TextStyle(
                                       fontFamily: 'Prompt',
-                                      fontSize: ResponsiveFlutter.of(context)
-                                          .fontSize(1.7),
+                                      fontSize: 14,
                                       color: Color.fromRGBO(27, 55, 120, 1.0),
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -356,9 +354,7 @@ class _AddlocationState extends State<Addlocation> {
                                           child: TextFormField(
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                             controller: name_user_address,
                                             decoration: InputDecoration(
@@ -366,9 +362,7 @@ class _AddlocationState extends State<Addlocation> {
                                               labelText: "ชื่อสถานที่",
                                               labelStyle: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                               border: OutlineInputBorder(
                                                 borderRadius:
@@ -388,9 +382,7 @@ class _AddlocationState extends State<Addlocation> {
                                         "จังหวัด : ",
                                         style: TextStyle(
                                           fontFamily: 'Prompt',
-                                          fontSize:
-                                              ResponsiveFlutter.of(context)
-                                                  .fontSize(1.7),
+                                          fontSize: 14,
                                           color:
                                               Color.fromRGBO(27, 55, 120, 1.0),
                                           // fontWeight: FontWeight.bold,
@@ -404,18 +396,14 @@ class _AddlocationState extends State<Addlocation> {
                                             "เลือกจังหวัด",
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                           ),
                                           iconSize: 24,
                                           elevation: 16,
                                           style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                               color: Colors.black),
                                           underline: SizedBox(),
                                           onChanged: (String? newValue) {
@@ -449,9 +437,7 @@ class _AddlocationState extends State<Addlocation> {
                                           "อำเภอ : ",
                                           style: TextStyle(
                                             fontFamily: 'Prompt',
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.7),
+                                            fontSize: 14,
                                             color: Color.fromRGBO(
                                                 27, 55, 120, 1.0),
                                             // fontWeight: FontWeight.bold,
@@ -463,9 +449,7 @@ class _AddlocationState extends State<Addlocation> {
                                               "เลือกอำเภอ",
                                               style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                             ),
                                             value: selectedValue_amphures,
@@ -475,9 +459,7 @@ class _AddlocationState extends State<Addlocation> {
                                             elevation: 16,
                                             style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                                 color: Colors.black),
 
                                             underline: SizedBox(),
@@ -515,9 +497,7 @@ class _AddlocationState extends State<Addlocation> {
                                           "ตำบล : ",
                                           style: TextStyle(
                                             fontFamily: 'Prompt',
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.7),
+                                            fontSize: 14,
                                             color: Color.fromRGBO(
                                                 27, 55, 120, 1.0),
                                             // fontWeight: FontWeight.bold,
@@ -529,9 +509,7 @@ class _AddlocationState extends State<Addlocation> {
                                               "เลือกตำบล",
                                               style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                             ),
                                             value: selectedValue_districts,
@@ -541,9 +519,7 @@ class _AddlocationState extends State<Addlocation> {
                                             elevation: 16,
                                             style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                                 color: Colors.black),
 
                                             underline: SizedBox(),
@@ -584,9 +560,7 @@ class _AddlocationState extends State<Addlocation> {
                                           child: TextFormField(
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                             minLines: 2,
                                             keyboardType:
@@ -604,9 +578,7 @@ class _AddlocationState extends State<Addlocation> {
                                               hintText: "บ้านเลขที่/หมู่บ้าน",
                                               hintStyle: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                               border: OutlineInputBorder(
                                                 borderRadius:
@@ -637,8 +609,7 @@ class _AddlocationState extends State<Addlocation> {
                                     "แผนที่ตั้ง",
                                     style: TextStyle(
                                       fontFamily: 'Prompt',
-                                      fontSize: ResponsiveFlutter.of(context)
-                                          .fontSize(1.7),
+                                      fontSize: 14,
                                       color: Color.fromRGBO(27, 55, 120, 1.0),
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -657,9 +628,7 @@ class _AddlocationState extends State<Addlocation> {
                                       Expanded(
                                         child: TextFormField(
                                           style: TextStyle(
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.5),
+                                            fontSize: 12,
                                           ),
                                           controller: lanlng_add,
                                           // keyboardType: TextInputType.number,
@@ -771,8 +740,7 @@ class _AddlocationState extends State<Addlocation> {
                                   "บันทึก",
                                   style: TextStyle(
                                     fontFamily: 'Prompt',
-                                    fontSize: ResponsiveFlutter.of(context)
-                                        .fontSize(1.7),
+                                    fontSize: 14,
                                   ),
                                 ),
                                 icon: Icon(Icons.map_outlined),
@@ -863,8 +831,7 @@ class _AddlocationState extends State<Addlocation> {
                                     "แก้ไขสถานที่ติดตั้งสินค้า",
                                     style: TextStyle(
                                       fontFamily: 'Prompt',
-                                      fontSize: ResponsiveFlutter.of(context)
-                                          .fontSize(1.7),
+                                      fontSize: 14,
                                       color: Color.fromRGBO(27, 55, 120, 1.0),
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -891,9 +858,7 @@ class _AddlocationState extends State<Addlocation> {
                                           child: TextFormField(
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                             controller: edit_name_user_address,
                                             decoration: InputDecoration(
@@ -901,9 +866,7 @@ class _AddlocationState extends State<Addlocation> {
                                               labelText: "ชื่อสถานที่",
                                               labelStyle: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                               border: OutlineInputBorder(
                                                 borderRadius:
@@ -923,9 +886,7 @@ class _AddlocationState extends State<Addlocation> {
                                         "จังหวัด : ",
                                         style: TextStyle(
                                           fontFamily: 'Prompt',
-                                          fontSize:
-                                              ResponsiveFlutter.of(context)
-                                                  .fontSize(1.7),
+                                          fontSize: 14,
                                           color:
                                               Color.fromRGBO(27, 55, 120, 1.0),
                                           // fontWeight: FontWeight.bold,
@@ -939,18 +900,14 @@ class _AddlocationState extends State<Addlocation> {
                                             "เลือกจังหวัด",
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                           ),
                                           iconSize: 24,
                                           elevation: 16,
                                           style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                               color: Colors.black),
                                           underline: SizedBox(),
                                           onChanged: (String? newValue) {
@@ -986,9 +943,7 @@ class _AddlocationState extends State<Addlocation> {
                                           "อำเภอ : ",
                                           style: TextStyle(
                                             fontFamily: 'Prompt',
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.7),
+                                            fontSize: 14,
                                             color: Color.fromRGBO(
                                                 27, 55, 120, 1.0),
                                             // fontWeight: FontWeight.bold,
@@ -1000,9 +955,7 @@ class _AddlocationState extends State<Addlocation> {
                                               "เลือกอำเภอ",
                                               style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                             ),
                                             value: edit_selectedValue_amphures,
@@ -1012,9 +965,7 @@ class _AddlocationState extends State<Addlocation> {
                                             elevation: 16,
                                             style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                                 color: Colors.black),
 
                                             underline: SizedBox(),
@@ -1053,9 +1004,7 @@ class _AddlocationState extends State<Addlocation> {
                                           "ตำบล : ",
                                           style: TextStyle(
                                             fontFamily: 'Prompt',
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.7),
+                                            fontSize: 14,
                                             color: Color.fromRGBO(
                                                 27, 55, 120, 1.0),
                                             // fontWeight: FontWeight.bold,
@@ -1067,9 +1016,7 @@ class _AddlocationState extends State<Addlocation> {
                                               "เลือกตำบล",
                                               style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                             ),
                                             value: edit_selectedValue_districts,
@@ -1079,9 +1026,7 @@ class _AddlocationState extends State<Addlocation> {
                                             elevation: 16,
                                             style: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                                 color: Colors.black),
 
                                             underline: SizedBox(),
@@ -1122,9 +1067,7 @@ class _AddlocationState extends State<Addlocation> {
                                           child: TextFormField(
                                             style: TextStyle(
                                               fontFamily: 'Prompt',
-                                              fontSize:
-                                                  ResponsiveFlutter.of(context)
-                                                      .fontSize(1.7),
+                                              fontSize: 14,
                                             ),
                                             minLines: 2,
                                             keyboardType:
@@ -1142,9 +1085,7 @@ class _AddlocationState extends State<Addlocation> {
                                               hintText: "บ้านเลขที่/หมู่บ้าน",
                                               hintStyle: TextStyle(
                                                 fontFamily: 'Prompt',
-                                                fontSize: ResponsiveFlutter.of(
-                                                        context)
-                                                    .fontSize(1.7),
+                                                fontSize: 14,
                                               ),
                                               border: OutlineInputBorder(
                                                 borderRadius:
@@ -1175,8 +1116,7 @@ class _AddlocationState extends State<Addlocation> {
                                     "แผนที่ตั้ง",
                                     style: TextStyle(
                                       fontFamily: 'Prompt',
-                                      fontSize: ResponsiveFlutter.of(context)
-                                          .fontSize(1.7),
+                                      fontSize: 14,
                                       color: Color.fromRGBO(27, 55, 120, 1.0),
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -1195,9 +1135,7 @@ class _AddlocationState extends State<Addlocation> {
                                       Expanded(
                                         child: TextFormField(
                                           style: TextStyle(
-                                            fontSize:
-                                                ResponsiveFlutter.of(context)
-                                                    .fontSize(1.5),
+                                            fontSize: 12,
                                           ),
                                           controller: edit_lanlng_add,
                                           // keyboardType: TextInputType.number,
@@ -1314,8 +1252,7 @@ class _AddlocationState extends State<Addlocation> {
                                   "แก้ไข",
                                   style: TextStyle(
                                     fontFamily: 'Prompt',
-                                    fontSize: ResponsiveFlutter.of(context)
-                                        .fontSize(1.7),
+                                    fontSize: 14,
                                   ),
                                 ),
                                 icon: Icon(Icons.map_outlined),
@@ -1477,14 +1414,14 @@ class _AddlocationState extends State<Addlocation> {
               title,
               style: TextStyle(
                 fontFamily: 'Prompt',
-                fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+                fontSize: 16,
               ),
             ),
             subtitle: Text(
               message,
               style: TextStyle(
                 fontFamily: 'Prompt',
-                fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+                fontSize: 14,
               ),
             ),
           ),
@@ -1503,7 +1440,7 @@ class _AddlocationState extends State<Addlocation> {
                         "ตกลง",
                         style: TextStyle(
                           fontFamily: 'Prompt',
-                          fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+                          fontSize: 14,
                         ),
                       ),
                     ],
@@ -1519,8 +1456,7 @@ class _AddlocationState extends State<Addlocation> {
                         "ยกเลิก",
                         style: TextStyle(
                             fontFamily: 'Prompt',
-                            fontSize:
-                                ResponsiveFlutter.of(context).fontSize(1.7),
+                            fontSize: 14,
                             color: Colors.red),
                       ),
                     ],
@@ -1680,7 +1616,6 @@ class _AddlocationState extends State<Addlocation> {
                           if (direction == DismissDirection.endToStart) {
                             //เมื่อเลือกทางขวา
                             var id_address_u =
-                            
                                 address_user[index].idUserAddress;
                             var address_u = address_user[index].nameUserAddress;
                             delete_address(id_address_u!, address_u!);

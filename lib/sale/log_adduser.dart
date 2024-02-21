@@ -9,7 +9,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:technician/dialog/dialog.dart';
@@ -478,7 +477,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                                     style: MyConstant().h3Style(),
                                   ),
                                   Container(
-                                    child: SearchableDropdown.single(
+                                    child: DropdownButton(
                                       hint: Text(
                                         "เลือกประเภทสินค้า",
                                         style: MyConstant().normalStyle(),
@@ -518,7 +517,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                                     style: MyConstant().h3Style(),
                                   ),
                                   Container(
-                                    child: SearchableDropdown.single(
+                                    child: DropdownButton(
                                       hint: Text(
                                         "เลือกแบรนด์สินค้า",
                                         style: MyConstant().normalStyle(),
@@ -797,7 +796,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกประเภทสินค้า",
                                       style: MyConstant().normalStyle(),
@@ -833,7 +832,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกแบรนด์สินค้า",
                                       style: MyConstant().normalStyle(),

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:technician/credit/home_checker_log.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
-import 'package:technician/models/user_checker_logmodel.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,6 +18,11 @@ class ShowCheckerLog extends StatefulWidget {
 
 class _ShowCheckerLogState extends State<ShowCheckerLog> {
   List data_checker_log = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   //เรียกใช้ api login
   Future<Null> checker_log(idstaff) async {

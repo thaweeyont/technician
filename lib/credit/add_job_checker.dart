@@ -8,7 +8,6 @@ import 'package:technician/ipconfig.dart';
 import 'package:technician/login.dart';
 import 'package:technician/models/jobcheckermodel.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/utility/my_constant.dart';
 
 class add_job_checker extends StatefulWidget {
@@ -223,54 +222,58 @@ class _add_job_checkerState extends State<add_job_checker> {
                     //   "สาขา : ",
                     //   style: MyConstant().h3Style(),
                     // ),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: ShapeDecoration(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        decoration: ShapeDecoration(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(30.0)),
+                          ),
                         ),
-                      ),
-                      width: MediaQuery.of(context).size.width * 0.95,
-                      child: DropdownButton(
-                        isExpanded: true,
-                        hint: Text(
-                          "สาขา",
-                          style: MyConstant().normalStyle(),
-                        ),
-                        value: selectedValue_branch,
-                        items: dropdown_branch.map((branchlist) {
-                          return DropdownMenuItem(
-                            value: branchlist['initials_branch'],
-                            child: Text(
-                              branchlist['name_branch'],
-                              style: MyConstant().h3Style(),
-                              overflow: TextOverflow.clip,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedValue_branch = value as String?;
-                            // text_initials_branch = selectedValue_branch;
-                            // id_card_user_key = key_idcard.text;
-                          });
-                          if (selectedValue_branch == null ||
-                              selectedValue_branch == "") {
-                            _getjob_checker(widget.initials_branch,
-                                key_idcard.text.toString(), dropdownValue);
-                          } else {
-                            _getjob_checker(selectedValue_branch,
-                                key_idcard.text.toString(), dropdownValue);
-                          }
-                        },
-                        underline: Container(
-                          height: 1.0,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.transparent, width: 0.0))),
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        child: DropdownButton(
+                          isExpanded: true,
+                          hint: Text(
+                            "สาขา",
+                            style: MyConstant().normalStyle(),
+                          ),
+                          value: selectedValue_branch,
+                          items: dropdown_branch.map((branchlist) {
+                            return DropdownMenuItem(
+                              value: branchlist['initials_branch'],
+                              child: Text(
+                                branchlist['name_branch'],
+                                style: MyConstant().h3Style(),
+                                overflow: TextOverflow.clip,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedValue_branch = value as String?;
+                              // text_initials_branch = selectedValue_branch;
+                              // id_card_user_key = key_idcard.text;
+                            });
+                            if (selectedValue_branch == null ||
+                                selectedValue_branch == "") {
+                              _getjob_checker(widget.initials_branch,
+                                  key_idcard.text.toString(), dropdownValue);
+                            } else {
+                              _getjob_checker(selectedValue_branch,
+                                  key_idcard.text.toString(), dropdownValue);
+                            }
+                          },
+                          underline: Container(
+                            height: 1.0,
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: Colors.transparent,
+                                        width: 0.0))),
+                          ),
                         ),
                       ),
                     ),
@@ -476,9 +479,7 @@ class _add_job_checkerState extends State<add_job_checker> {
               "ไม่มีข้อมูล",
               style: TextStyle(
                 fontFamily: 'Prompt',
-                fontSize: ResponsiveFlutter.of(context).fontSize(
-                  2.5,
-                ),
+                fontSize: 14,
                 color: Colors.grey[400],
               ),
             ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';

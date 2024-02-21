@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/mechanic/homt.dart';
@@ -264,7 +263,7 @@ class _SettingMechanicState extends State<SettingMechanic> {
                                       ),
                                       width: MediaQuery.of(context).size.width *
                                           0.8,
-                                      child: SearchableDropdown.single(
+                                      child: DropdownButton(
                                         hint: Text(
                                           "ชื่อช่างติดตั้ง",
                                           style: MyConstant().h3Style(),
@@ -285,7 +284,7 @@ class _SettingMechanicState extends State<SettingMechanic> {
                                           if (value != null) {
                                             setState(() {
                                               selectedValue_mec =
-                                                  value[0].toString();
+                                                  value.toString();
                                             });
                                           } else {
                                             selectedValue_mec =

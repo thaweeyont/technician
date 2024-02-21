@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:package_info/package_info.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/models/versionapp.dart';
@@ -17,6 +16,28 @@ class ShowVersion extends StatefulWidget {
 
 class _ShowVersionState extends State<ShowVersion> {
   String? version = MyConstant.version_app;
+
+  @override
+  void initState() {
+    super.initState();
+    _initPackageInfo();
+  }
+
+  PackageInfo packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+    // buildSignature: 'Unknown',
+    // installerStore: 'Unknown',
+  );
+
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      packageInfo = info;
+    });
+  }
 
   Future<Null> oldversion(
       BuildContext context, String title, String message) async {
@@ -49,7 +70,8 @@ class _ShowVersionState extends State<ShowVersion> {
               children: [
                 TextButton(
                   onPressed: () async {
-                    await launch("${versions[0].urlVersion}");
+                    await canLaunchUrl('${versions[0].urlVersion}' as Uri);
+                    // await launch("${versions[0].urlVersion}");
                   },
                   child: Column(
                     children: [
@@ -88,7 +110,7 @@ class _ShowVersionState extends State<ShowVersion> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
@@ -114,7 +136,7 @@ class _ShowVersionState extends State<ShowVersion> {
             ),
             subtitle: Text(
               message,
-              style: MyConstant().normalStyle(),
+              style: MyConstant().textVersion(),
             ),
           ),
           children: [
@@ -136,13 +158,13 @@ class _ShowVersionState extends State<ShowVersion> {
       ),
       animationType: DialogTransitionType.fadeScale,
       curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 0),
     );
   }
 
   List<Version> versions = [];
   //เรียกใช้ api เช็ค version
-  Future<Null> _getversion() async {
+  Future<Null> getversion() async {
     try {
       var respose = await http.get(Uri.http(
           ipconfig, '/flutter_api/api_staff/get_version_appstaff.php'));
@@ -150,7 +172,6 @@ class _ShowVersionState extends State<ShowVersion> {
       if (respose.statusCode == 200) {
         setState(() {
           versions = versionFromJson(respose.body);
-
           if (version == versions[0].version) {
             newversion(context, 'version $version',
                 'แอปพลิเคชั่นเป็นเวอร์ชั่นปัจจุบัน');
@@ -171,17 +192,19 @@ class _ShowVersionState extends State<ShowVersion> {
     var sizeh = MediaQuery.of(context).size.height;
     return ListTile(
       onTap: () async {
-        _getversion();
+        // getversion();
+        newversion(context, 'version ${packageInfo.version}',
+            'แอปพลิเคชั่นเป็นเวอร์ชั่นปัจจุบัน');
       },
       leading: Icon(
-        Icons.refresh_rounded,
+        Icons.info_outline,
         size: size * 0.06,
       ),
       title: Text(
         "เวอร์ชั่นแอป",
         style: TextStyle(
           fontFamily: 'Prompt',
-          fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+          fontSize: 16,
           fontWeight: FontWeight.bold,
           color: Color.fromRGBO(27, 55, 120, 1.0),
         ),
@@ -190,7 +213,7 @@ class _ShowVersionState extends State<ShowVersion> {
         "เช็คเวอร์ชั่นแอปพลิเคชั่นล่าสุด",
         style: TextStyle(
           fontFamily: 'Prompt',
-          fontSize: ResponsiveFlutter.of(context).fontSize(1.4),
+          fontSize: 12,
           color: Color.fromRGBO(27, 55, 120, 1.0),
         ),
       ),

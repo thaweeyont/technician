@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,8 +10,6 @@ import 'package:technician/models/credit_historymodel.dart';
 import 'package:technician/models/job_log_addressmodel.dart';
 import 'package:technician/models/product_job.dart';
 import 'package:technician/utility/my_constant.dart';
-import 'package:technician/widgets/show_progress.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class history extends StatefulWidget {
   final String idstaff;
@@ -240,10 +236,7 @@ class _historyState extends State<history> {
                                                     "${productjob[x].productCount} x",
                                                     style: TextStyle(
                                                       fontFamily: 'Prompt',
-                                                      fontSize:
-                                                          ResponsiveFlutter.of(
-                                                                  context)
-                                                              .fontSize(1.7),
+                                                      fontSize: 14,
                                                       color: Color.fromRGBO(
                                                           27, 55, 120, 1.0),
                                                     ),

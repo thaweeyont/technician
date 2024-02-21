@@ -11,7 +11,7 @@ class MyConstant {
 
   // Color Gradient
   static Color dark_f = Color(0xff1b3778);
-  static Color dark_e = Color(0xff5b85e3);
+  static Color dark_e = Color(0xff1b3778);
 
   // TextStyle
   TextStyle h1Style() => TextStyle(
@@ -30,6 +30,12 @@ class MyConstant {
         fontSize: 15,
         color: dark,
         fontWeight: FontWeight.w700,
+        fontFamily: 'Prompt',
+      );
+  TextStyle textVersion() => TextStyle(
+        fontSize: 13,
+        color: Colors.grey,
+        fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
   TextStyle h2_5greenStyle() => TextStyle(
@@ -53,6 +59,12 @@ class MyConstant {
   TextStyle h3Style() => TextStyle(
         fontSize: 14,
         color: dark,
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Prompt',
+      );
+  TextStyle exitStyle() => TextStyle(
+        fontSize: 14,
+        color: Colors.red,
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
@@ -92,6 +104,12 @@ class MyConstant {
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
+  TextStyle smallwhiteStyle() => TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Prompt',
+      );
   TextStyle normalredStyle() => TextStyle(
         fontSize: 14,
         color: Colors.red,
@@ -104,8 +122,8 @@ class MyConstant {
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
-  TextStyle textLoading() => const TextStyle(
-        fontSize: 16,
+  TextStyle textLoading() => TextStyle(
+        fontSize: 14,
         color: Colors.white,
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',

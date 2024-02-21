@@ -1,22 +1,16 @@
-import 'dart:io';
+import 'dart:convert';
 
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:technician/credit/credit.dart';
 import 'package:technician/dialog/dialog.dart';
-import 'package:technician/mechanic/homt.dart';
-import 'package:technician/ipconfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:technician/models/staffmodel.dart';
-import 'package:technician/models/versionapp.dart';
-import 'package:technician/sale/sale.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/utility/my_constant.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'credit/home_checker_log.dart';
+import 'ipconfig_checkerlog.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -26,257 +20,99 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  var zone_staff,
+      initials_branch,
+      branch_name,
+      idStaff,
+      name_staff,
+      status_show;
   //ประกาศตัวแปร
   TextEditingController id_staff = TextEditingController();
   String? version = MyConstant.version_app;
   List<Staff> datamechanic = [];
+  List data_checker_log = [];
   String? token;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  //function select data
-  Future<void> _getid_staff(String id_staff) async {
-    try {
-      var respose = await http.get(
-        Uri.http(ipconfig, '/flutter_api/api_staff/get_staff.php',
-            {"id_staff": id_staff}),
-      );
-      print(respose.body);
-      if (respose.statusCode == 200) {
-        print("มีข้อมูล");
-
-        setState(() {
-          datamechanic = staffFromJson(respose.body);
-          loginlog();
-        });
-      }
-    } catch (e) {
-      print("ไม่มีข้อมูล");
-      normalDialog(context, 'แจ้งเตือน', "รหัสพนักงานไม่ถูกต้อง");
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _getversion();
+    getprofile_staff();
   }
 
-  Future<Null> gettoken() async {
-    FirebaseMessaging.instance.getToken().then((value) {
-      setState(() {
-        token = value;
-      });
-      update_token(token!);
+  Future<void> getprofile_staff() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      idStaff = preferences.getString('idstaff');
     });
-  }
 
-  Future<Null> update_token(String token) async {
-    var uri = Uri.parse(
-        "http://110.164.131.46/flutter_api/api_staff/update_token_staff.php");
-    var request = new http.MultipartRequest("POST", uri);
-
-    request.fields['token'] = token;
-    request.fields['idstaff'] = id_staff.text;
-
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      print("==================>update_token_success");
-      _getid_staff(id_staff.text);
+    if (idStaff != null) {
+      checker_log(idStaff);
     }
   }
 
-  Future<Null> oldversion(
-      BuildContext context, String title, String message) async {
-    showAnimatedDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-          ),
-          child: SimpleDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(20.0),
-              ),
-            ),
-            title: ListTile(
-              leading: Image.asset('images/error_log.gif'),
-              title: Text(
-                title,
-                style: TextStyle(
-                  fontFamily: 'Prompt',
-                  fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
-                ),
-              ),
-              subtitle: Text(
-                message,
-                style: TextStyle(
-                  fontFamily: 'Prompt',
-                  fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
-                ),
-              ),
-            ),
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  TextButton(
-                    onPressed: () async {
-                      await launch("${versions[0].urlVersion}");
-                    },
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "ตกลง",
-                              style: TextStyle(
-                                fontFamily: 'Prompt',
-                                fontSize:
-                                    ResponsiveFlutter.of(context).fontSize(1.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      exit(0);
-                    },
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "ยกเลิก",
-                              style: TextStyle(
-                                fontFamily: 'Prompt',
-                                fontSize:
-                                    ResponsiveFlutter.of(context).fontSize(1.7),
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-      animationType: DialogTransitionType.fadeScale,
-      curve: Curves.fastOutSlowIn,
-      duration: Duration(seconds: 1),
-    );
-  }
-
-  List<Version> versions = [];
-  //เรียกใช้ api เช็ค version
-  Future<Null> _getversion() async {
+  //เรียกใช้ api login
+  Future<Null> checker_log(idstaff) async {
     try {
       var respose = await http.get(Uri.http(
-          ipconfig, '/flutter_api/api_staff/get_version_appstaff.php'));
-      // print(respose.body);
+        ipconfig_checker,
+        '/CheckerData2/api/Login.php',
+        {"pws_us": idstaff},
+      ));
       if (respose.statusCode == 200) {
         setState(() {
-          versions = versionFromJson(respose.body);
-
-          if (version == versions[0].version) {
-            checkPreferance();
-          } else {
-            oldversion(context, 'version $version',
-                'อัพเดตแอปพลิเคชั่น version $version => ${versions[0].version}');
-          }
+          data_checker_log = json.decode(respose.body);
         });
+
+        var zone = data_checker_log[0]['zone'];
+        var saka = data_checker_log[0]['saka'];
+        var name_user = data_checker_log[0]['name_user'];
+        var level = data_checker_log[0]['level_status'];
+        var ip_conn = ipconfig_checker_office;
+        print("========>auther");
+        if (respose.body != 'error') {
+          SharedPreferences preferences = await SharedPreferences.getInstance();
+          preferences.setString('idstaff', idstaff!);
+          preferences.setString('name_staff', name_user!);
+          Navigator.push(context, CupertinoPageRoute(builder: (context) {
+            return Home_Checker_log(zone!, saka!, name_user!, level!, ip_conn);
+          }));
+        } else {
+          Navigator.pop(context);
+          normalDialog(context, 'Error',
+              "ขออภัย คุณไม่มีสิทธิ์เข้าถึง หน้า Checker Log");
+        }
+      } else {
+        normalDialog(context, 'Error', "check error");
       }
     } catch (e) {
-      print("ไม่มีข้อมูล");
-    }
-  }
-
-  Future<Null> loginlog() async {
-    var idStaff = datamechanic[0].idStaff;
-    var status_staff = datamechanic[0].statusStaff;
-    var name_staff = datamechanic[0].fullnameStaff;
-    var zone_staff = datamechanic[0].zone;
-    var initials_branch = datamechanic[0].initialsBranch;
-    var branch_name = datamechanic[0].nameBranch;
-    var branch_lat = datamechanic[0].latBranch;
-    var branch_lng = datamechanic[0].lngBranch;
-    var idBranch = datamechanic[0].idBranch;
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setString('idStaff', idStaff!);
-    preferences.setString('status_staff', status_staff!);
-    preferences.setString('name_staff', name_staff!);
-    preferences.setString('zone_staff', zone_staff!);
-    preferences.setString('initials_branch', initials_branch!);
-    preferences.setString('branch_name', branch_name!);
-    preferences.setString('branch_lat', branch_lat!);
-    preferences.setString('branch_lng', branch_lng!);
-    preferences.setString('idBranch', idBranch!);
-
-    if (status_staff == "1") {
-      print("พนักงานขาย");
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Sale(),
-        ),
-      );
-    } else if (status_staff == "2") {
-      print("สินเชื่อ");
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Credit(),
-        ),
-      );
-    } else if (status_staff == "3") {
-      print("ช่างติดตั้ง");
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Home(),
-        ),
-      );
-    }
-  }
-
-  Future<Null> checkPreferance() async {
-    try {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      String? check_staff = preferences.getString('status_staff');
-      if (check_staff != null && check_staff.isNotEmpty) {
-        if (check_staff == "1") {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => Sale(),
-            ),
-          );
-        } else if (check_staff == "2") {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => Credit(),
-            ),
-          );
-        } else if (check_staff == "3") {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => Home(),
-            ),
-          );
+      // print("ไม่มีข้อมูล");
+      var respose = await http.get(Uri.http(ipconfig_checker_office,
+          '/CheckerData2/api/Login.php', {"pws_us": idstaff}));
+      if (respose.statusCode == 200) {
+        setState(() {
+          data_checker_log = json.decode(respose.body);
+        });
+        var zone = data_checker_log[0]['zone'];
+        var saka = data_checker_log[0]['saka'];
+        var name_user = data_checker_log[0]['name_user'];
+        var level = data_checker_log[0]['level_status'];
+        var ip_conn = ipconfig_checker_office;
+        print("========>office");
+        if (respose.body != 'error') {
+          SharedPreferences preferences = await SharedPreferences.getInstance();
+          preferences.setString('idstaff', idstaff!);
+          preferences.setString('name_staff', name_user!);
+          Navigator.push(context, CupertinoPageRoute(builder: (context) {
+            return Home_Checker_log(zone!, saka!, name_user!, level!, ip_conn);
+          }));
+        } else {
+          Navigator.pop(context);
+          normalDialog(context, 'Error',
+              "ขออภัย คุณไม่มีสิทธิ์เข้าถึง หน้า Checker Log");
         }
       }
-    } catch (e) {
-      print("Error");
     }
   }
 
@@ -294,6 +130,7 @@ class _LoginState extends State<Login> {
           elevation: 0,
         ),
         body: Container(
+          width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
                 colors: [MyConstant.dark_f, MyConstant.dark_e],
@@ -304,11 +141,59 @@ class _LoginState extends State<Login> {
           ),
           padding: EdgeInsets.all(15),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: 80),
               logo(size),
-              input_staff(size),
-              button(size, sizeh, context),
+              SizedBox(height: 40),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                width: MediaQuery.of(context).size.width * 0.8,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 168, 168, 168),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
+                      spreadRadius: 0.8,
+                      blurRadius: 20,
+                      offset: const Offset(0, 7),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                // height: MediaQuery.of(context).size.height * 0.3,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
+                      spreadRadius: 0.8,
+                      blurRadius: 20,
+                      offset: const Offset(0, 7),
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    input_staff(size),
+                    SizedBox(height: 10),
+                    button(size, sizeh, context),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+              // Container(
+              //   margin: EdgeInsets.only(top: 300),
+              //   child: Text(
+              //     'by THAWEEYONT MARKETING CO.,LTD',
+              //     style: MyConstant().normalStyle(),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -318,10 +203,8 @@ class _LoginState extends State<Login> {
 
   Container button(double size, double sizeh, BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: size * 0.05),
       width: size * 0.35,
       height: sizeh * 0.05,
-      // ignore: deprecated_member_use
       child: Container(
         decoration: ShapeDecoration(
             shape: const StadiumBorder(),
@@ -333,10 +216,11 @@ class _LoginState extends State<Login> {
             ),
             shadows: [
               BoxShadow(
-                color: Colors.grey,
-                blurRadius: 1,
-                // offset: Offset(1, 2), // Shadow position
-              ),
+                color: Color.fromARGB(255, 88, 88, 88).withOpacity(0.7),
+                spreadRadius: 0.6,
+                blurRadius: 7,
+                offset: const Offset(0, 5),
+              )
             ]),
         child: MaterialButton(
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -362,7 +246,7 @@ class _LoginState extends State<Login> {
             if (id_staff.text.isEmpty) {
               normalDialog(context, 'แจ้งเตือน', "กรุณากรอกรหัส");
             } else {
-              gettoken();
+              checker_log(id_staff.text);
             }
           },
         ),
@@ -372,16 +256,11 @@ class _LoginState extends State<Login> {
 
   Container input_staff(double size) {
     return Container(
-      margin: EdgeInsets.only(
-        left: size * 0.10,
-        right: size * 0.10,
-        bottom: size * 0.04,
-        top: size * 0.15,
-      ),
+      padding: EdgeInsets.all(15),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color.fromARGB(131, 228, 228, 228),
           borderRadius: BorderRadius.all(
             Radius.circular(35),
           ),
@@ -389,9 +268,9 @@ class _LoginState extends State<Login> {
         child: Row(
           children: <Widget>[
             Icon(
-              Icons.person,
-              color: Colors.grey[450],
-              size: size * 0.04,
+              Icons.account_circle,
+              color: Color.fromARGB(132, 82, 82, 82),
+              size: size * 0.06,
             ),
             SizedBox(
               width: size * 0.02,
@@ -403,7 +282,7 @@ class _LoginState extends State<Login> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: "รหัสประจำตัวพนักงาน",
-                  hintStyle: MyConstant().normallightStyle(),
+                  hintStyle: MyConstant().normalStyle(),
                   border: InputBorder.none,
                 ),
                 onChanged: (String keyword) {},
@@ -418,16 +297,24 @@ class _LoginState extends State<Login> {
   Container logo(double size) {
     return Container(
       padding: EdgeInsets.only(
-        left: 10,
-        right: 10,
+        left: 20,
+        right: 20,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(20),
         ),
         color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
+            spreadRadius: 0.8,
+            blurRadius: 20,
+            offset: const Offset(0, 7),
+          )
+        ],
       ),
-      width: double.infinity,
+      width: MediaQuery.of(context).size.width * 0.8,
       height: size * 0.30,
       child: Image.asset(
         'images/logo_mc2.png',

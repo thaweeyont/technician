@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/dialog/dialog.dart';
@@ -18,11 +17,7 @@ import 'package:technician/mechanic/add_job_mechanic.dart';
 import 'package:technician/mechanic/detailjob.dart';
 import 'package:technician/mechanic/history.dart';
 import 'package:technician/ipconfig.dart';
-import 'package:technician/login.dart';
-import 'package:technician/models/detail_product.dart';
 import 'package:technician/models/jobmodel.dart';
-import 'package:technician/models/product_detail.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/models/stampmodel.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_admin_mechanic.dart';
@@ -278,14 +273,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                 title,
                 style: TextStyle(
                   fontFamily: 'Prompt',
-                  fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+                  fontSize: 16,
                 ),
               ),
               subtitle: Text(
                 message,
                 style: TextStyle(
                   fontFamily: 'Prompt',
-                  fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -305,7 +300,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       "ตกลง",
                       style: TextStyle(
                         fontFamily: 'Prompt',
-                        fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -351,14 +346,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   title,
                   style: TextStyle(
                     fontFamily: 'Prompt',
-                    fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+                    fontSize: 16,
                   ),
                 ),
                 subtitle: Text(
                   message,
                   style: TextStyle(
                     fontFamily: 'Prompt',
-                    fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -380,8 +375,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                                 "ตกลง",
                                 style: TextStyle(
                                   fontFamily: 'Prompt',
-                                  fontSize: ResponsiveFlutter.of(context)
-                                      .fontSize(1.7),
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -404,8 +398,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                                 "ออกจากระบบ",
                                 style: TextStyle(
                                   fontFamily: 'Prompt',
-                                  fontSize: ResponsiveFlutter.of(context)
-                                      .fontSize(1.7),
+                                  fontSize: 14,
                                   color: Colors.red,
                                 ),
                               ),
@@ -666,8 +659,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             "ปิดรับงาน",
                             style: TextStyle(
                               fontFamily: 'Prompt',
-                              fontSize:
-                                  ResponsiveFlutter.of(context).fontSize(2.5),
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.red,
                             ),
@@ -708,8 +700,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           "เปิดรับงาน",
                           style: TextStyle(
                             fontFamily: 'Prompt',
-                            fontSize:
-                                ResponsiveFlutter.of(context).fontSize(2.5),
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.green,
                           ),

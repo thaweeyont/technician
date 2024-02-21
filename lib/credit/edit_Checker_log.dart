@@ -15,6 +15,7 @@ import 'package:technician/ipconfig_checkerlog.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/widgets/show_progress.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 class EditCheckerLog extends StatefulWidget {
   final String? id_user,
@@ -42,7 +43,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   TextEditingController lastname_kam2_text = TextEditingController();
   TextEditingController name_kam3_text = TextEditingController();
   TextEditingController lastname_kam3_text = TextEditingController();
-  double? lat, lng;
+  double? lat, lng, latitude, longitude;
   String? selectedValue;
   List<File?> files = [];
   File? file;
@@ -58,7 +59,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   List list_saka = [];
   List list_more = [];
   String? val_zone;
-  String? val_saka;
+  String? val_saka, lat2, lng2;
   bool show_edit_zonesaka = false;
   String? prefixname_customer_text;
   String? prefixname_kam1_text;
@@ -257,6 +258,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
+          String url = data_customer[0]['insert_maps_no1'];
+          String numbersPart = url.split('=')[1];
+          List<String> numbers = numbersPart.split(',');
+          latitude = double.parse(numbers[0]);
+          longitude = double.parse(numbers[1]);
+          print('Latitude: $latitude, Longitude: $longitude');
 
           name_customer_text.text = data_customer[0]['cus_name'].toString();
           if (data_customer[0]['cus_prefix'] != "") {
@@ -318,6 +325,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
+          String url = data_customer[0]['insert_maps_no1'];
+          String numbersPart = url.split('=')[1];
+          List<String> numbers = numbersPart.split(',');
+          latitude = double.parse(numbers[0]);
+          longitude = double.parse(numbers[1]);
+          print('Latitude: $latitude, Longitude: $longitude');
 
           name_customer_text.text = data_customer[0]['cus_name'].toString();
           if (data_customer[0]['cus_prefix'] != "") {
@@ -389,7 +402,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
-        successDialog(context, "สำเร็จ", "แก้ไขชื่อเสร็จสิ้น");
+        successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
       } else {
         print("แก้ไขชื่อไม่สำเร็จ");
         normalDialog(context, "เตือน", "เกิดข้อผิดพลาด");
@@ -407,7 +420,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
-        successDialog(context, "สำเร็จ", "แก้ไขชื่อเสร็จสิ้น");
+        successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
       } else {
         print("แก้ไขชื่อไม่สำเร็จ");
         normalDialog(context, "เตือน", "เกิดข้อผิดพลาด");
@@ -487,12 +500,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           if (name_customer_text.text == "") {
             normalDialog(context, "เตือน", "กรุณาเพิ่มชื่อผู้ซื้อ");
           } else {
-            // print("${name_customer_text.text},$index : บันทึก");
             //แสดงภาพที่แก้ไข
             setState(() {
               file = File(result!.path);
               files[index] = file;
             });
+            print('test1');
+            showProgressLoading(context);
             upload_file(index, name_customer_text.text);
           }
         }
@@ -501,12 +515,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           if (name_customer_text.text == "") {
             normalDialog(context, "เตือน", "กรุณาเพิ่มชื่อผู้ซื้อ");
           } else {
-            // print("${name_customer_text.text},$index : บันทึก");
             //แสดงภาพที่แก้ไข
             setState(() {
               file = File(result!.path);
               files[index] = file;
             });
+            print('test2');
+            showProgressLoading(context);
             upload_file(index, name_customer_text.text);
           }
         }
@@ -515,12 +530,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         if (name_kam1_text.text == "") {
           normalDialog(context, "เตือน", "กรุณาเพิ่มชื่อผู้ค้ำ 1 ");
         } else {
-          // print("${name_kam1_text.text},$index : บันทึก");
           //แสดงภาพที่แก้ไข
           setState(() {
             file = File(result!.path);
             files[index] = file;
           });
+          showProgressLoading(context);
           upload_file(index, name_kam1_text.text);
         }
       }
@@ -528,12 +543,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         if (name_kam2_text.text == "") {
           normalDialog(context, "เตือน", "กรุณาเพิ่มชื่อผู้ค้ำ 2 ");
         } else {
-          // print("${name_kam1_text.text},$index : บันทึก");
           //แสดงภาพที่แก้ไข
           setState(() {
             file = File(result!.path);
             files[index] = file;
           });
+          showProgressLoading(context);
           upload_file(index, name_kam2_text.text);
         }
       }
@@ -541,12 +556,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
         if (name_kam3_text.text == "") {
           normalDialog(context, "เตือน", "กรุณาเพิ่มชื่อผู้ค้ำ 3 ");
         } else {
-          // print("${name_kam1_text.text},$index : บันทึก");
           //แสดงภาพที่แก้ไข
           setState(() {
             file = File(result!.path);
             files[index] = file;
           });
+          showProgressLoading(context);
           upload_file(index, name_kam3_text.text);
         }
       }
@@ -555,6 +570,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           file = File(result!.path);
           files[index] = file;
         });
+        showProgressLoading(context);
         upload_file(index, name_customer_text.text);
       }
     } catch (e) {
@@ -573,9 +589,10 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       map_customer['file'] =
           await MultipartFile.fromFile(files[index]!.path, filename: nameFile);
       FormData data_customer = FormData.fromMap(map_customer);
-      var response = await Dio()
+      await Dio()
           .post(api_upload_img_customer, data: data_customer)
           .then((value) {
+        Navigator.pop(context);
         successDialog(context, "สำเร็จ", "แก้ไขภาพเสร็จสิ้น");
       });
     } catch (e) {
@@ -587,9 +604,10 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       map_customer['file'] =
           await MultipartFile.fromFile(files[index]!.path, filename: nameFile);
       FormData data_customer = FormData.fromMap(map_customer);
-      var response = await Dio()
+      await Dio()
           .post(api_upload_img_customer, data: data_customer)
           .then((value) {
+        Navigator.pop(context);
         successDialog(context, "สำเร็จ", "แก้ไขภาพเสร็จสิ้น");
       });
     }
@@ -727,6 +745,19 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           show_more = false;
         });
       }
+    }
+  }
+
+  Future<void> openMap() async {
+    print('mapEdit>> ${latitude}_${longitude}');
+    Uri googleMapUrl = Uri.parse(
+      'https://www.google.co.th/maps/search/?api=1&query=${latitude},${longitude}',
+    );
+    if (!await launcher.launchUrl(
+      googleMapUrl,
+      mode: launcher.LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not open the map $googleMapUrl');
     }
   }
 
@@ -985,8 +1016,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
       FormData data_more = FormData.fromMap(map_more);
-      var response =
-          await Dio().post(api_upload_img_more, data: data_more).then((value) {
+      await Dio().post(api_upload_img_more, data: data_more).then((value) {
         _list_more();
         print("---------------- success upload ----------------------");
       });
@@ -999,8 +1029,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
       FormData data_more = FormData.fromMap(map_more);
-      var response =
-          await Dio().post(api_upload_img_more, data: data_more).then((value) {
+      await Dio().post(api_upload_img_more, data: data_more).then((value) {
         _list_more();
         print("---------------- success upload ----------------------");
       });
@@ -1076,7 +1105,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    color: Colors.blue[50],
+                    padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
                     child: Row(
                       children: [
                         Text(
@@ -1091,7 +1122,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(bottom: 10.0),
+              // margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
                 children: [
                   Row(
@@ -1154,6 +1185,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                   )),
             ] else ...[
               Container(
+                padding: EdgeInsets.all(10),
+                color: Color.fromARGB(255, 228, 228, 228).withOpacity(0.3),
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1289,10 +1322,11 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                               InkWell(
                                 onTap: () {
                                   if (lat != null) {
-                                    showmap();
+                                    // showmap();
+                                    openMap();
                                   }
                                 },
-                                child: Icon(Icons.map),
+                                child: Icon(Icons.pin_drop_rounded),
                               ),
                             },
                           ],
@@ -1304,7 +1338,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
                 children: [
                   Row(
@@ -1645,6 +1678,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -1693,6 +1727,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -1739,6 +1774,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -1834,7 +1870,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             ),
             if (show_kam1 == true) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 10.0),
                 child: Column(
                   children: [
                     Row(
@@ -2209,7 +2244,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             ),
             if (show_kam2 == true) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 10.0),
                 child: Column(
                   children: [
                     Row(
@@ -2584,7 +2618,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             ),
             if (show_kam3 == true) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 10.0),
                 child: Column(
                   children: [
                     Row(
@@ -3282,10 +3315,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       return Container(
         decoration: new BoxDecoration(color: Colors.white),
         alignment: Alignment.center,
-        height: size * 0.40,
-        child: FadeInImage.assetNetwork(
-            placeholder: 'images/load_img.gif',
-            image: 'http://${widget.ip_conn}/CheckerData2/$img'),
+        // height: size * 0.42,
+        height: MediaQuery.of(context).size.height * 0.187,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: FadeInImage.assetNetwork(
+              placeholder: 'images/load_img.gif',
+              image: 'http://${widget.ip_conn}/CheckerData2/$img'),
+        ),
         // child: Image.network('http://${widget.ip_conn}/checker_data/$img'),
       );
     }
@@ -3298,9 +3335,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
           child: Container(
             decoration: new BoxDecoration(color: Colors.white),
             alignment: Alignment.center,
-            height: size * 0.40,
-            child: Image.file(
-              files[index]!,
+            height: MediaQuery.of(context).size.height * 0.187,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.file(
+                files[index]!,
+              ),
             ),
           ),
         ),
@@ -3320,17 +3360,19 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                   padding: const EdgeInsets.only(right: 10, top: 10),
                   child: Stack(
                     children: <Widget>[
-                      // Text("------------$i"),
                       InkWell(
                         // onTap: () => zoom_img(0),
                         child: Container(
                           decoration: new BoxDecoration(color: Colors.white),
                           alignment: Alignment.center,
                           height: size * 0.45,
-                          child: FadeInImage.assetNetwork(
-                              placeholder: 'images/load_img.gif',
-                              image:
-                                  'http://${widget.ip_conn}/CheckerData2/${list_more[i]['name_img']}'),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: FadeInImage.assetNetwork(
+                                placeholder: 'images/load_img.gif',
+                                image:
+                                    'http://${widget.ip_conn}/CheckerData2/${list_more[i]['name_img']}'),
+                          ),
                         ),
                       ),
                       Positioned(

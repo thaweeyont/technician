@@ -8,7 +8,6 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
@@ -18,7 +17,6 @@ import 'package:technician/sale/addlocation.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/widgets/show_title.dart';
 
 class Adduser extends StatefulWidget {
@@ -440,7 +438,7 @@ class _AdduserState extends State<Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกประเภทสินค้า",
                                       style: MyConstant().normalStyle(),
@@ -457,7 +455,8 @@ class _AdduserState extends State<Adduser> {
                                     }).toList(),
                                     onChanged: (value) {
                                       setState(() {
-                                        selectedValue_product = value;
+                                        selectedValue_product =
+                                            value.toString();
                                       });
                                     },
                                   ),
@@ -479,7 +478,7 @@ class _AdduserState extends State<Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกแบรนด์สินค้า",
                                       style: MyConstant().normalStyle(),
@@ -752,7 +751,7 @@ class _AdduserState extends State<Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกประเภทสินค้า",
                                       style: MyConstant().normalStyle(),
@@ -791,7 +790,7 @@ class _AdduserState extends State<Adduser> {
                                   style: MyConstant().h3Style(),
                                 ),
                                 Container(
-                                  child: SearchableDropdown.single(
+                                  child: DropdownButton(
                                     hint: Text(
                                       "เลือกแบรนด์สินค้า",
                                       style: MyConstant().normalStyle(),

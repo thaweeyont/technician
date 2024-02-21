@@ -11,7 +11,6 @@ import 'package:technician/ipconfig.dart';
 import 'package:technician/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/models/data_checker.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_checker_log.dart';
 import 'package:technician/widgets/show_profile.dart';

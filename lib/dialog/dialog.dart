@@ -32,13 +32,13 @@ Future<void> showProgressLoading(BuildContext context) async {
             Radius.circular(10),
           ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(cupertinoActivityIndicator, scale: 4),
             // Text(
-            //   'กำลังโหลด',
+            //   'Loading...',
             //   style: MyConstant().textLoading(),
             // ),
           ],

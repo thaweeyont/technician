@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -21,13 +20,10 @@ import 'package:technician/mechanic/setting_mechanic.dart';
 import 'package:technician/models/detail_mechanicmodel.dart';
 import 'package:technician/models/detail_product_mechanicmodel.dart';
 import 'package:technician/models/job_log_addressmodel.dart';
-import 'package:technician/models/jobmodel.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:technician/widgets/show_progress.dart';
-// import 'package:qrscans/qrscan.dart' as scanner;
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:responsive_flutter/responsive_flutter.dart';
 
 class detailjob extends StatefulWidget {
   final String id_gen_job, id_staff, time_go;
@@ -579,14 +575,14 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
             'ภาพใบเสร็จที่ ${index + 1} ?',
             style: TextStyle(
               fontFamily: 'Prompt',
-              fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+              fontSize: 16,
             ),
           ),
           subtitle: Text(
             'โปรดเลือกภาพจากรูปภาพในเครื่อง หรือ ถ่ายภาพ',
             style: TextStyle(
               fontFamily: 'Prompt',
-              fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+              fontSize: 14,
             ),
           ),
         ),
@@ -603,7 +599,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                   "คลังภาพ",
                   style: TextStyle(
                     fontFamily: 'Prompt',
-                    fontSize: ResponsiveFlutter.of(context).fontSize(1.8),
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -617,7 +613,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                   style: TextStyle(
                     fontFamily: 'Prompt',
                     // color: Colors.red,
-                    fontSize: ResponsiveFlutter.of(context).fontSize(1.8),
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -651,14 +647,14 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
             'ภาพการติดตั้งที่ ${index + 1} ?',
             style: TextStyle(
               fontFamily: 'Prompt',
-              fontSize: ResponsiveFlutter.of(context).fontSize(2.0),
+              fontSize: 16,
             ),
           ),
           subtitle: Text(
             'โปรดเลือกภาพจากรูปภาพในเครื่อง หรือ ถ่ายภาพ',
             style: TextStyle(
               fontFamily: 'Prompt',
-              fontSize: ResponsiveFlutter.of(context).fontSize(1.7),
+              fontSize: 14,
             ),
           ),
         ),
@@ -675,7 +671,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                   "คลังภาพ",
                   style: TextStyle(
                     fontFamily: 'Prompt',
-                    fontSize: ResponsiveFlutter.of(context).fontSize(1.8),
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -689,7 +685,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                   style: TextStyle(
                     fontFamily: 'Prompt',
                     // color: Colors.red,
-                    fontSize: ResponsiveFlutter.of(context).fontSize(1.8),
+                    fontSize: 14,
                   ),
                 ),
               ),

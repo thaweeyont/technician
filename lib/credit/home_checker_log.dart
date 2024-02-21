@@ -2,13 +2,20 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:technician/credit/add_checker_log.dart';
 import 'package:technician/credit/edit_Checker_log.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
+
+import '../widgets/show_profile.dart';
+import '../widgets/show_signout.dart';
+import '../widgets/show_version.dart';
 
 class Home_Checker_log extends StatefulWidget {
   final String zone, saka, name_user, level, ip_conn;
@@ -20,13 +27,113 @@ class Home_Checker_log extends StatefulWidget {
 }
 
 class _Home_Checker_logState extends State<Home_Checker_log> {
+  var zone_staff,
+      initials_branch,
+      branch_name,
+      idStaff,
+      name_staff,
+      status_show;
+  double? lat, lng;
+  String position = '';
   final f = new DateFormat('dd/MM/yyyy');
-  List data_customer = [];
+  List data_customer = [], dataAddress = [];
   TextEditingController search = TextEditingController();
   @override
   void initState() {
     super.initState();
+    getprofile_staff();
+    CheckPermission();
     checker_log(widget.zone, widget.saka, widget.name_user);
+  }
+
+  Future<void> getprofile_staff() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      idStaff = preferences.getString('idstaff');
+      name_staff = preferences.getString('name_staff');
+    });
+  }
+
+  // CheckPermission
+  Future<Null> CheckPermission() async {
+    bool locationService;
+    LocationPermission locationPermission;
+
+    locationService = await Geolocator.isLocationServiceEnabled();
+    if (locationService) {
+      print('Service Location Open');
+      locationPermission = await Geolocator.checkPermission();
+      if (locationPermission == LocationPermission.denied) {
+        locationPermission = await Geolocator.requestPermission();
+        if (locationPermission == LocationPermission.deniedForever) {
+          alertLocationService(
+              context, 'ไม่อนุญาติแชร์ Location', 'โปรดแชร์ location');
+        } else {
+          // Find LatLong
+          findLatLng();
+        }
+      } else {
+        if (locationPermission == LocationPermission.deniedForever) {
+          alertLocationService(
+              context, 'ไม่อนุญาติแชร์ Location', 'โปรดแชร์ location');
+        } else {
+          // Find LatLong
+          findLatLng();
+        }
+      }
+    } else {
+      print('Service Location Close');
+      alertLocationService(
+          context, 'Location ปิดอยู่?', 'กรุณาเปิด Location ด้วยคะ');
+    }
+  }
+
+  Future<Null> findLatLng() async {
+    Position? position = await findPosition();
+    setState(() {
+      lat = position!.latitude;
+      lng = position.longitude;
+      print('lat_mec = $lat, lng_mec = $lng');
+      getAddressFromCoordinates();
+    });
+  }
+
+  void getAddressFromCoordinates() async {
+    var latitude = lat;
+    var longitude = lng;
+    String address = await getAddress(latitude, longitude);
+    setState(() {
+      position = address;
+    });
+    print('Address: $address');
+  }
+
+  Future<String> getAddress(latitude, longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      print(placemarks);
+      if (placemarks != 'null' && placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        String address =
+            '${placemark.subLocality}, ${placemark.locality}, ${placemark.administrativeArea}, ${placemark.postalCode}';
+        return address;
+      }
+    } catch (e) {
+      print('Error getting address: $e');
+    }
+    return 'null';
+  }
+
+  Future<Position?> findPosition() async {
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      return position;
+    } catch (e) {
+      return null;
+    }
   }
 
   //เรียกใช้ api แสดงข้อมูล
@@ -39,6 +146,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         "saka": saka,
         "name_user": name_user,
         "level": widget.level.toString(),
+        "IdUser": idStaff,
       }));
       if (respose.statusCode == 200) {
         var status = json.decode(respose.body);
@@ -56,6 +164,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         "saka": saka,
         "name_user": name_user,
         "level": widget.level.toString(),
+        "IdUser": idStaff,
       }));
 
       if (respose.statusCode == 200) {
@@ -73,9 +182,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
 
   //เรียกใช้ api แสดงข้อมูล
   Future<Null> filter_checker_log(zone, saka, running, name_user) async {
-    setState(() {
-      data_customer = [];
-    });
+    data_customer = [];
     try {
       var respose = await http.get(Uri.http(
           ipconfig_checker, '/CheckerData2/api/GetSearchContract.php', {
@@ -122,23 +229,16 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            }),
         centerTitle: true,
         backgroundColor: MyConstant.dark_f,
         elevation: 0,
         title: Text(
-          "${widget.name_user}",
+          "",
           style: MyConstant().h2whiteStyle(),
         ),
         actions: [],
       ),
+      drawer: drawerStaff(sizeh),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: RefreshIndicator(
@@ -205,71 +305,172 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
     );
   }
 
+  Drawer drawerStaff(double sizeh) {
+    return Drawer(
+      child: Stack(
+        children: [
+          ShowSignOut(),
+          Column(
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(
+                  "$name_staff",
+                  style: MyConstant().h2_5whiteStyle(),
+                ),
+                accountEmail: Text(
+                  "พนักงานสินเชื่อ",
+                  style: MyConstant().normalwhiteStyle(),
+                ),
+                currentAccountPicture: ClipRRect(
+                  borderRadius: BorderRadius.circular(110),
+                  child: Icon(
+                    Icons.account_circle,
+                    color: Colors.white,
+                    size: sizeh * 0.07,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        const Color.fromRGBO(27, 55, 120, 1.0),
+                        const Color.fromRGBO(62, 105, 201, 1),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.clamp),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
+                  ),
+                ),
+              ),
+              ShowVersion(),
+              new Divider(
+                height: 0,
+              ),
+              ShowProfile(idStaff),
+              new Divider(
+                height: 0,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget search_running(size, sizeh) => Stack(
         children: [
           Positioned(
             child: Container(
-              padding: EdgeInsets.only(
-                top: 10,
-              ),
+              // padding: EdgeInsets.only(top: 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(15),
                   bottomRight: Radius.circular(15),
                 ),
                 gradient: LinearGradient(
-                    colors: [
-                      const Color.fromRGBO(27, 55, 120, 1.0),
-                      const Color.fromRGBO(62, 105, 201, 1),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.0, 1.0],
-                    tileMode: TileMode.clamp),
+                  colors: [
+                    const Color.fromRGBO(27, 55, 120, 1.0),
+                    const Color.fromRGBO(62, 105, 201, 1),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp,
+                ),
               ),
               width: double.infinity,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15),
+                    child: Row(
+                      children: [
+                        Text(
+                          "สวัสดีคุณ $name_staff",
+                          style: MyConstant().h2whiteStyle(),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          style: MyConstant().normalStyle(),
-                          controller: search,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            hintText: "ค้นหาเลขที่รันนิ่ง",
-                            hintStyle: MyConstant().normalStyle(),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (String keyword) {
-                            if (keyword == "") {
-                              checker_log(
-                                  widget.zone, widget.saka, widget.name_user);
-                            } else {
-                              filter_checker_log(widget.zone, widget.saka,
-                                  keyword, widget.name_user);
-                            }
-                          },
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.place,
+                          color: Colors.red,
+                          size: MediaQuery.of(context).size.width * 0.05,
+                        ),
+                        Text(
+                          '$position',
+                          style: MyConstant().smallwhiteStyle(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15),
+                    child: Row(
+                      children: [
+                        Text(
+                          "ค้นหาเอกสารสัญญา",
+                          style: MyConstant().h2_5whiteStyle(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
                         ),
                       ),
-                      IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.search,
-                            color: Colors.black.withAlpha(120),
-                          )),
-                    ],
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              style: MyConstant().normalStyle(),
+                              controller: search,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: "กรอกเลขรันนิ่งสัญญา",
+                                hintStyle: MyConstant().normalStyle(),
+                                border: InputBorder.none,
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Colors.black.withAlpha(120),
+                                ),
+                              ),
+                              onChanged: (String keyword) {
+                                if (keyword == "") {
+                                  checker_log(widget.zone, widget.saka,
+                                      widget.name_user);
+                                } else {
+                                  filter_checker_log(widget.zone, widget.saka,
+                                      keyword, widget.name_user);
+                                }
+                              },
+                            ),
+                          ),
+                          // IconButton(
+                          //   onPressed: () {},
+                          //   icon: Icon(
+                          //     Icons.search,
+                          //     color: Colors.black.withAlpha(120),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
