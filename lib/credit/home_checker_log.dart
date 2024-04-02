@@ -112,7 +112,6 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(latitude, longitude);
-      print(placemarks);
       if (placemarks != 'null' && placemarks.isNotEmpty) {
         Placemark placemark = placemarks[0];
         String address =
@@ -173,6 +172,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
           setState(() {
             data_customer = status['data'];
           });
+          print('${data_customer[0]['G1_Fname']}');
         }
       } else {
         normalDialog(context, 'Error', "check error");
@@ -232,18 +232,19 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
         centerTitle: true,
         backgroundColor: MyConstant.dark_f,
         elevation: 0,
-        title: Text(
-          "",
-          style: MyConstant().h2whiteStyle(),
+        title: Image.asset(
+          'images/logo_mc2.png',
+          width: MediaQuery.of(context).size.width * 0.25,
         ),
-        actions: [],
       ),
       drawer: drawerStaff(sizeh),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: RefreshIndicator(
           onRefresh: () async {
-            checker_log(widget.zone, widget.saka, widget.name_user);
+            setState(() {
+              checker_log(widget.zone, widget.saka, widget.name_user);
+            });
           },
           child: Column(
             children: [

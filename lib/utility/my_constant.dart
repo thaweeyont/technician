@@ -98,6 +98,12 @@ class MyConstant {
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );
+  TextStyle normalblackStyle() => TextStyle(
+        fontSize: 14,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Prompt',
+      );
   TextStyle normalwhiteStyle() => TextStyle(
         fontSize: 14,
         color: Colors.white,
@@ -125,6 +131,12 @@ class MyConstant {
   TextStyle textLoading() => TextStyle(
         fontSize: 14,
         color: Colors.white,
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Prompt',
+      );
+  TextStyle text() => TextStyle(
+        fontSize: 16,
+        color: Color.fromARGB(255, 129, 129, 144),
         fontWeight: FontWeight.normal,
         fontFamily: 'Prompt',
       );

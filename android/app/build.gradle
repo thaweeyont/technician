@@ -53,8 +53,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
         minSdkVersion 21
         targetSdkVersion 33
         multiDexEnabled true
-        versionCode 15
-        versionName '1.0.16'
+        versionCode 22
+        versionName '1.1.18'
     }
 
  signingConfigs {

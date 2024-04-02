@@ -58,15 +58,17 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   List list_zone = [];
   List list_saka = [];
   List list_more = [];
+  String url = '';
   String? val_zone;
   String? val_saka, lat2, lng2;
-  bool show_edit_zonesaka = false;
+  bool show_edit_zonesaka = false, checkbtnEditkam = false;
   String? prefixname_customer_text;
   String? prefixname_kam1_text;
   String? prefixname_kam2_text;
   String? prefixname_kam3_text;
   @override
   void initState() {
+    print(widget.id_user);
     super.initState();
     CheckPermission();
     _list_zone();
@@ -76,6 +78,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
     initialFile_customer();
     // data_checker_log(widget.id_user);
     set_value_st();
+    print('type>${widget.type_running}');
   }
 
   //CheckPermission
@@ -191,9 +194,11 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
 
   //list_more
   Future<Null> _list_more() async {
+    list_more = [];
     try {
       var respose = await http.post(Uri.http(
           ipconfig_checker, '/CheckerData2/api/DataShowEditImgMore.php', {
+        "id_user": widget.id_user.toString(),
         "id_runing": widget.running_id.toString(),
         "type_runing": widget.type_running.toString(),
       }));
@@ -205,10 +210,12 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             list_more = data['data'];
           });
         }
+        print('img_more>${list_more}');
       }
     } catch (e) {
       var respose = await http.post(Uri.http(ipconfig_checker_office,
           '/CheckerData2/api/DataShowEditImgMore.php', {
+        "id_user": widget.id_user.toString(),
         "id_runing": widget.running_id.toString(),
         "type_runing": widget.type_running.toString(),
       }));
@@ -220,6 +227,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             list_more = data['data'];
           });
         }
+        print('img_more>${list_more}');
       }
     }
   }
@@ -258,12 +266,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
-          String url = data_customer[0]['insert_maps_no1'];
-          String numbersPart = url.split('=')[1];
-          List<String> numbers = numbersPart.split(',');
-          latitude = double.parse(numbers[0]);
-          longitude = double.parse(numbers[1]);
-          print('Latitude: $latitude, Longitude: $longitude');
+          url = data_customer[0]['insert_maps_no1'];
+
+          if (url.isNotEmpty) {
+            String numbersPart = url.split('=')[1];
+            List<String> numbers = numbersPart.split(',');
+            latitude = double.parse(numbers[0]);
+            longitude = double.parse(numbers[1]);
+          }
 
           name_customer_text.text = data_customer[0]['cus_name'].toString();
           if (data_customer[0]['cus_prefix'] != "") {
@@ -325,12 +335,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
-          String url = data_customer[0]['insert_maps_no1'];
-          String numbersPart = url.split('=')[1];
-          List<String> numbers = numbersPart.split(',');
-          latitude = double.parse(numbers[0]);
-          longitude = double.parse(numbers[1]);
-          print('Latitude: $latitude, Longitude: $longitude');
+          url = data_customer[0]['insert_maps_no1'];
+          if (url.isNotEmpty) {
+            String numbersPart = url.split('=')[1];
+            List<String> numbers = numbersPart.split(',');
+            latitude = double.parse(numbers[0]);
+            longitude = double.parse(numbers[1]);
+          }
 
           name_customer_text.text = data_customer[0]['cus_name'].toString();
           if (data_customer[0]['cus_prefix'] != "") {
@@ -388,7 +399,8 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   }
 
   //Api แก้ไขชื่อ
-  Future change_name_api(prefix, name, lastname, type) async {
+  Future change_name_api(
+      prefix, name, lastname, type_running, type, alert) async {
     try {
       var uri = Uri.parse(
           "http://$ipconfig_checker/CheckerData2/api/UpdateNameCustomer.php");
@@ -396,13 +408,16 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       request.fields['name'] = name;
       request.fields['lastname'] = lastname;
       request.fields['prefix'] = prefix;
+      request.fields['type_running'] = type_running.toString();
       request.fields['type'] = type.toString();
       request.fields['id_user'] = widget.id_user!;
       request.fields['running_id'] = widget.running_id!;
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
-        successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
+        if (alert == 'alert') {
+          successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
+        }
       } else {
         print("แก้ไขชื่อไม่สำเร็จ");
         normalDialog(context, "เตือน", "เกิดข้อผิดพลาด");
@@ -414,13 +429,16 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       request.fields['name'] = name;
       request.fields['lastname'] = lastname;
       request.fields['prefix'] = prefix;
+      request.fields['type_running'] = type_running.toString();
       request.fields['type'] = type.toString();
       request.fields['id_user'] = widget.id_user!;
       request.fields['running_id'] = widget.running_id!;
       var response = await request.send();
       if (response.statusCode == 200) {
         print("แก้ไขชื่อสำเร็จ");
-        successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
+        if (alert == 'alert') {
+          successDialog(context, "สำเร็จ", "แก้ไขข้อมูลเสร็จสิ้น");
+        }
       } else {
         print("แก้ไขชื่อไม่สำเร็จ");
         normalDialog(context, "เตือน", "เกิดข้อผิดพลาด");
@@ -505,7 +523,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               file = File(result!.path);
               files[index] = file;
             });
-            print('test1');
             showProgressLoading(context);
             upload_file(index, name_customer_text.text);
           }
@@ -520,7 +537,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               file = File(result!.path);
               files[index] = file;
             });
-            print('test2');
             showProgressLoading(context);
             upload_file(index, name_customer_text.text);
           }
@@ -535,6 +551,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             file = File(result!.path);
             files[index] = file;
           });
+          change_name(
+              prefixname_kam1_text,
+              name_kam1_text.text,
+              lastname_kam1_text.text,
+              widget.type_running.toString(),
+              1,
+              'noalert');
           showProgressLoading(context);
           upload_file(index, name_kam1_text.text);
         }
@@ -548,6 +571,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             file = File(result!.path);
             files[index] = file;
           });
+          change_name(
+              prefixname_kam1_text,
+              name_kam1_text.text,
+              lastname_kam1_text.text,
+              widget.type_running.toString(),
+              2,
+              'noalert');
           showProgressLoading(context);
           upload_file(index, name_kam2_text.text);
         }
@@ -561,6 +591,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             file = File(result!.path);
             files[index] = file;
           });
+          change_name(
+              prefixname_kam1_text,
+              name_kam1_text.text,
+              lastname_kam1_text.text,
+              widget.type_running.toString(),
+              3,
+              'noalert');
           showProgressLoading(context);
           upload_file(index, name_kam3_text.text);
         }
@@ -656,34 +693,51 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
   }
 
   // แก้ไขชื่อ
-  Future<Null> change_name(prefix, name, lastname, type) async {
+  Future<Null> change_name(
+      prefix, name, lastname, type_running, type, alert) async {
 // type : 0 => ผู้ซื้อ, 1 => ค้ำ1, 2 => ค้ำ2, 3 => ค้ำ3,
     if (type == 0) {
-      if (name == "" || name == null) {
+      if (name == "" ||
+          name == null ||
+          lastname == "" ||
+          lastname == null ||
+          prefix == null) {
         normalDialog(context, "เตือน", "กรุณาระบุชื่อผู้ซื้อ");
       } else {
-        change_name_api(prefix, name, lastname, type);
+        change_name_api(prefix, name, lastname, type_running, type, alert);
       }
     }
     if (type == 1) {
-      if (name == "" || name == null) {
+      if (name == "" ||
+          name == null ||
+          lastname == "" ||
+          lastname == null ||
+          prefix == null) {
         normalDialog(context, "เตือน", "กรุณาระบุชื่อผู้ค้ำ 1");
       } else {
-        change_name_api(prefix, name, lastname, type);
+        change_name_api(prefix, name, lastname, type_running, type, alert);
       }
     }
     if (type == 2) {
-      if (name == "" || name == null) {
+      if (name == "" ||
+          name == null ||
+          lastname == "" ||
+          lastname == null ||
+          prefix == null) {
         normalDialog(context, "เตือน", "กรุณาระบุชื่อผู้ค้ำ 2");
       } else {
-        change_name_api(prefix, name, lastname, type);
+        change_name_api(prefix, name, lastname, type_running, type, alert);
       }
     }
     if (type == 3) {
-      if (name == "" || name == null) {
+      if (name == "" ||
+          name == null ||
+          lastname == "" ||
+          lastname == null ||
+          prefix == null) {
         normalDialog(context, "เตือน", "กรุณาระบุชื่อผู้ค้ำ 3");
       } else {
-        change_name_api(prefix, name, lastname, type);
+        change_name_api(prefix, name, lastname, type_running, type, alert);
       }
     }
   }
@@ -913,11 +967,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       request.fields['id_more'] = id_more.toString();
       var response = await request.send();
       if (response.statusCode == 200) {
-        print("แก้ไขสำเร็จ");
+        print("ลบสำเร็จ");
+        setState(() {
+          _list_more();
+        });
       } else {
-        print("แก้ไขไม่สำเร็จ");
+        print("ลบไม่สำเร็จ");
       }
-      _list_more();
     } catch (e) {
       var uri = Uri.parse(
           "http://$ipconfig_checker_office/CheckerData2/api/DeleteImgMore.php");
@@ -925,11 +981,13 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       request.fields['id_more'] = id_more.toString();
       var response = await request.send();
       if (response.statusCode == 200) {
-        print("แก้ไขสำเร็จ");
+        print("ลบสำเร็จ");
+        setState(() {
+          _list_more();
+        });
       } else {
-        print("แก้ไขไม่สำเร็จ");
+        print("ลบไม่สำเร็จ");
       }
-      _list_more();
     }
   }
 //------------------------------------------------------- บันทึก / จัดการภาพ เพิ่มเติม --------------------------------------------------------------------------
@@ -1011,7 +1069,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker_more$i.jpg';
       String api_upload_img_more =
-          'http://$ipconfig_checker/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
+          'http://$ipconfig_checker/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&id_user=${widget.id_user}';
       Map<String, dynamic> map_more = {};
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
@@ -1024,7 +1082,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       int i = Random().nextInt(10000000);
       String nameFile = 'edit_checker_more$i.jpg';
       String api_upload_img_more =
-          'http://$ipconfig_checker_office/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}';
+          'http://$ipconfig_checker_office/CheckerData2/api/UploadImgMore.php?zone=${widget.zone}&saka=${widget.saka}&type_running=${widget.type_running}&running_id=${widget.running_id}&id_user=${widget.id_user}';
       Map<String, dynamic> map_more = {};
       map_more['file'] =
           await MultipartFile.fromFile(file_more!.path, filename: nameFile);
@@ -1036,7 +1094,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
     }
   }
 
-// -
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
@@ -1326,7 +1383,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                                     openMap();
                                   }
                                 },
-                                child: Icon(Icons.pin_drop_rounded),
+                                child: url.isNotEmpty
+                                    ? Icon(Icons.pin_drop_rounded)
+                                    : Text(''),
                               ),
                             },
                           ],
@@ -1452,7 +1511,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                                 prefixname_customer_text,
                                 name_customer_text.text,
                                 lastname_customer_text.text,
-                                0);
+                                widget.type_running.toString(),
+                                0,
+                                '');
                           },
                           child: Text(
                             'แก้ไข',
@@ -1967,7 +2028,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                                   prefixname_kam1_text,
                                   name_kam1_text.text,
                                   lastname_kam1_text.text,
-                                  1);
+                                  widget.type_running.toString(),
+                                  1,
+                                  'alert');
                             },
                             child: Text(
                               'แก้ไข',
@@ -2008,7 +2071,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบัตรประชาชน", 4);
+                              if (name_kam1_text.text.isEmpty ||
+                                  lastname_kam1_text.text.isEmpty ||
+                                  prefixname_kam1_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ1");
+                              } else {
+                                img_customer("รูปบัตรประชาชน", 4);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2056,7 +2126,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("แผนที่บ้าน", 5);
+                              if (name_kam1_text.text.isEmpty ||
+                                  lastname_kam1_text.text.isEmpty ||
+                                  prefixname_kam1_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ1");
+                              } else {
+                                img_customer("แผนที่บ้าน", 5);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2104,7 +2181,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบ้าน", 6);
+                              if (name_kam1_text.text.isEmpty ||
+                                  lastname_kam1_text.text.isEmpty ||
+                                  prefixname_kam1_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ1");
+                              } else {
+                                img_customer("รูปบ้าน", 6);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2152,7 +2236,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปตอนเซ็น", 7);
+                              if (name_kam1_text.text.isEmpty ||
+                                  lastname_kam1_text.text.isEmpty ||
+                                  prefixname_kam1_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ1");
+                              } else {
+                                img_customer("รูปตอนเซ็น", 7);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2341,7 +2432,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                                   prefixname_kam2_text,
                                   name_kam2_text.text,
                                   lastname_kam2_text.text,
-                                  2);
+                                  widget.type_running.toString(),
+                                  2,
+                                  'alert');
                             },
                             child: Text(
                               'แก้ไข',
@@ -2382,7 +2475,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบัตรประชาชน", 8);
+                              if (name_kam2_text.text.isEmpty ||
+                                  lastname_kam2_text.text.isEmpty ||
+                                  prefixname_kam2_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ2");
+                              } else {
+                                img_customer("รูปบัตรประชาชน", 8);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2430,7 +2530,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("แผนที่บ้าน", 9);
+                              if (name_kam2_text.text.isEmpty ||
+                                  lastname_kam2_text.text.isEmpty ||
+                                  prefixname_kam2_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ2");
+                              } else {
+                                img_customer("แผนที่บ้าน", 9);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2478,7 +2585,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบ้าน", 10);
+                              if (name_kam2_text.text.isEmpty ||
+                                  lastname_kam2_text.text.isEmpty ||
+                                  prefixname_kam2_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ2");
+                              } else {
+                                img_customer("รูปบ้าน", 10);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2526,7 +2640,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปตอนเซ็น", 11);
+                              if (name_kam2_text.text.isEmpty ||
+                                  lastname_kam2_text.text.isEmpty ||
+                                  prefixname_kam2_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ2");
+                              } else {
+                                img_customer("รูปตอนเซ็น", 11);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2715,7 +2836,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                                   prefixname_kam3_text,
                                   name_kam3_text.text,
                                   lastname_kam3_text.text,
-                                  3);
+                                  widget.type_running.toString(),
+                                  3,
+                                  'alert');
                             },
                             child: Text(
                               'แก้ไข',
@@ -2756,7 +2879,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบัตรประชาชน", 12);
+                              if (name_kam3_text.text.isEmpty ||
+                                  lastname_kam3_text.text.isEmpty ||
+                                  prefixname_kam3_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ3");
+                              } else {
+                                img_customer("รูปบัตรประชาชน", 12);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2804,7 +2934,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("แผนที่บ้าน", 13);
+                              if (name_kam3_text.text.isEmpty ||
+                                  lastname_kam3_text.text.isEmpty ||
+                                  prefixname_kam3_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ3");
+                              } else {
+                                img_customer("แผนที่บ้าน", 13);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2852,7 +2989,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปบ้าน", 14);
+                              if (name_kam3_text.text.isEmpty ||
+                                  lastname_kam3_text.text.isEmpty ||
+                                  prefixname_kam3_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ3");
+                              } else {
+                                img_customer("รูปบ้าน", 14);
+                              }
                             }
                           },
                           onLongPress: () {
@@ -2900,7 +3044,14 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
                             if (data_customer[0]['status'] !=
                                     "ตรวจสอบสัญญาเรียบร้อย" ||
                                 widget.level == "checker_runnig") {
-                              img_customer("รูปตอนเซ็น", 15);
+                              if (name_kam3_text.text.isEmpty ||
+                                  lastname_kam3_text.text.isEmpty ||
+                                  prefixname_kam3_text == null) {
+                                normalDialog(context, "เตือน",
+                                    "กรุณาระบุ ชื่อ-สกุล ผู้ค้ำ3");
+                              } else {
+                                img_customer("รูปตอนเซ็น", 15);
+                              }
                             }
                           },
                           onLongPress: () {

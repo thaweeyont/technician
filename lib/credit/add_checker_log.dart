@@ -16,8 +16,6 @@ import 'package:http/http.dart' as http;
 import 'package:technician/widgets/show_progress.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../order_traking_page.dart';
-
 class AddCheckerLog extends StatefulWidget {
   final String? saka, zone, name_user, ip_conn, level;
   AddCheckerLog(this.saka, this.zone, this.name_user, this.ip_conn, this.level);
@@ -53,6 +51,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   bool show_kam3 = false;
   bool show_other = false;
   bool show_more = false;
+  bool isCheckedCK = false;
   List typerunnig = [];
   List list_zone = [];
   List list_saka = [];
@@ -62,6 +61,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   String? prefixname_kam1_text;
   String? prefixname_kam2_text;
   String? prefixname_kam3_text;
+  String checkDoc = '';
   // ตั้ง id text in put
   TextEditingController id_running_text = TextEditingController();
   // TextEditingController prefixname_customer_text = TextEditingController();
@@ -874,7 +874,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         int i = Random().nextInt(10000000);
         String nameFile = 'checker$i.jpg';
         String api_upload_img_customer =
-            'http://$ipconfig_checker/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
+            'http://$ipconfig_checker/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text&isCheckedCK=$checkDoc';
         Map<String, dynamic> map_customer = {};
         map_customer['file'] = await MultipartFile.fromFile(
             file_img_customer!.path,
@@ -893,7 +893,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam1$i.jpg';
           String api_upload_img_kam1 =
-              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text&CountIndexG1=$CountIndexG1';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text&CountIndexG1=$CountIndexG1&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam1 = {};
           map_kam1['file'] = await MultipartFile.fromFile(file_img_kam1!.path,
               filename: nameFile);
@@ -903,6 +903,8 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             print(value);
           });
         }
+        print(
+            'zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text&CountIndexG1=$CountIndexG1&isCheckedCK=$checkDoc');
       }
 
       //บันทึกผู้ค้ำ 2
@@ -912,7 +914,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam2$i.jpg';
           String api_upload_img_kam2 =
-              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text&CountIndexG2=$CountIndexG2';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text&CountIndexG2=$CountIndexG2&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam2 = {};
           map_kam2['file'] = await MultipartFile.fromFile(file_img_kam2!.path,
               filename: nameFile);
@@ -933,7 +935,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam3$i.jpg';
           String api_upload_img_kam3 =
-              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text&CountIndexG3=$CountIndexG3';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text&CountIndexG3=$CountIndexG3&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam3 = {};
           map_kam3['file'] = await MultipartFile.fromFile(file_img_kam3!.path,
               filename: nameFile);
@@ -951,7 +953,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_other$i.jpg';
           String api_upload_img_other =
-              'http://$ipconfig_checker/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_other = {};
           map_other['file'] = await MultipartFile.fromFile(file_img_other!.path,
               filename: nameFile);
@@ -969,7 +971,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_more$i.jpg';
           String api_upload_img_more =
-              'http://$ipconfig_checker/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
+              'http://$ipconfig_checker/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_more = {};
           map_more['file'] = await MultipartFile.fromFile(file_img_more!.path,
               filename: nameFile);
@@ -987,7 +989,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         int i = Random().nextInt(10000000);
         String nameFile = 'checker$i.jpg';
         String api_upload_img_customer =
-            'http://$ipconfig_checker_office/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text';
+            'http://$ipconfig_checker_office/CheckerData2/api/ImgCustomer.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&name_cus=${name_customer_text.text}&name_admin=${widget.name_user}&level=${widget.level}&lastname_cus=${lastname_customer_text.text}&prefix_cus=$prefixname_customer_text&isCheckedCK=$checkDoc';
         Map<String, dynamic> map_customer = {};
         map_customer['file'] = await MultipartFile.fromFile(
             file_img_customer!.path,
@@ -1005,7 +1007,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam1$i.jpg';
           String api_upload_img_kam1 =
-              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG1.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam1_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam1_text.text}&prefix_kam=$prefixname_kam1_text&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam1 = {};
           map_kam1['file'] = await MultipartFile.fromFile(file_img_kam1!.path,
               filename: nameFile);
@@ -1022,7 +1024,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam2$i.jpg';
           String api_upload_img_kam2 =
-              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG2.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam2_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam2_text.text}&prefix_kam=$prefixname_kam2_text&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam2 = {};
           map_kam2['file'] = await MultipartFile.fromFile(file_img_kam2!.path,
               filename: nameFile);
@@ -1039,7 +1041,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_kam3$i.jpg';
           String api_upload_img_kam3 =
-              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadG3.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&name_kam=${name_kam3_text.text}&lat=$lat&lng=$lng&lastname_kam=${lastname_kam3_text.text}&prefix_kam=$prefixname_kam3_text&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_kam3 = {};
           map_kam3['file'] = await MultipartFile.fromFile(file_img_kam3!.path,
               filename: nameFile);
@@ -1056,7 +1058,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_other$i.jpg';
           String api_upload_img_other =
-              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadOther.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&lat=$lat&lng=$lng&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_other = {};
           map_other['file'] = await MultipartFile.fromFile(file_img_other!.path,
               filename: nameFile);
@@ -1074,7 +1076,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           int i = Random().nextInt(10000000);
           String nameFile = 'checker_more$i.jpg';
           String api_upload_img_more =
-              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}';
+              'http://$ipconfig_checker_office/CheckerData2/api/ImgUploadMore.php?zone=$val_zone&saka=$val_saka&type_running=$selectedValue&running_id=${id_running_text.text}&isCheckedCK=$checkDoc';
           Map<String, dynamic> map_more = {};
           map_more['file'] = await MultipartFile.fromFile(file_img_more!.path,
               filename: nameFile);
@@ -1143,13 +1145,14 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   }
 
   //เช็ครันนิ่ง
-  Future<Null> Checker_runing(type, runnig_id) async {
+  Future<Null> Checker_runing(type, runnig_id, isCheckedCK) async {
     // data_customer = [];
     try {
       var respose = await http.get(
           Uri.http('$ipconfig_checker', '/CheckerData2/api/CheckRunning.php', {
         "type_running": type,
         "running_id": runnig_id,
+        "isCheckedCK": isCheckedCK,
       }));
       if (respose.statusCode == 200) {
         print(respose.body);
@@ -1177,6 +1180,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
           '$ipconfig_checker_office', '/CheckerData2/api/CheckRunning.php', {
         "type_running": type,
         "running_id": runnig_id,
+        "isCheckedCK": isCheckedCK,
       }));
       if (respose.statusCode == 200) {
         print(respose.body);
@@ -1262,15 +1266,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   }
 
   Future<void> openMap() async {
-    print('map>> ${lat}_${lng}');
-    // final url = Uri.parse(
-    //     'https://www.google.co.th/maps/search/?api=1&query=${lat},${lng}');
-    // if (await canLaunchUrl(url)) {
-    //   await launchUrl(url);
-    // } else {
-    //   throw 'Could not launch $url';
-    // }
-
+    print('map> ${lat}_${lng}');
     Uri googleMapUrl = Uri.parse(
       'https://www.google.co.th/maps/search/?api=1&query=${lat},${lng}',
     );
@@ -1441,7 +1437,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(bottom: 10.0),
+              // margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
                 children: [
                   Container(
@@ -1467,6 +1463,41 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                 ],
               ),
             ),
+            Row(
+              children: [
+                Checkbox(
+                  side: MaterialStateBorderSide.resolveWith(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.selected)) {
+                        return const BorderSide(
+                            color: Color.fromARGB(255, 0, 0, 0), width: 1.7);
+                      }
+                      return const BorderSide(
+                          color: Color.fromARGB(255, 0, 0, 0), width: 1.7);
+                    },
+                  ),
+                  value: isCheckedCK,
+                  checkColor: const Color.fromARGB(255, 0, 0, 0),
+                  activeColor: const Color.fromARGB(255, 255, 255, 255),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isCheckedCK = value!;
+                    });
+                    if (isCheckedCK == true) {
+                      checkDoc = 'true';
+                    } else {
+                      checkDoc = 'false';
+                    }
+                    Checker_runing(
+                        selectedValue, id_running_text.text, checkDoc);
+                  },
+                ),
+                Text(
+                  'บันทึกเอกสารเดิม',
+                  style: MyConstant().h3Style(),
+                ),
+              ],
+            ),
             Container(
               margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
@@ -1483,7 +1514,9 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                                   context, "เตือน", "กรุณาเลือกประเภทเอกสาร");
                               id_running_text.clear();
                             } else {
-                              Checker_runing(selectedValue, running.toString());
+                              print('c>>$checkDoc');
+                              Checker_runing(
+                                  selectedValue, running.toString(), checkDoc);
                             }
                           },
                           keyboardType: TextInputType.number,
@@ -1644,8 +1677,8 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                       selectedValue = value as String?;
                     });
                     if (id_running_text.text.toString().length == 6) {
-                      Checker_runing(
-                          selectedValue, id_running_text.text.toString());
+                      Checker_runing(selectedValue,
+                          id_running_text.text.toString(), checkDoc);
                     }
                   },
                   underline: Container(
@@ -1800,19 +1833,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                                   " ผู้ซื้อ",
                                   style: MyConstant().h2_5Style(),
                                 ),
-                                // SizedBox(width: 10),
-                                // InkWell(
-                                //   onTap: () {
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //         builder: (context) =>
-                                //             OrderTrakingPage(),
-                                //       ),
-                                //     );
-                                //   },
-                                //   child: Icon(Icons.map_outlined),
-                                // ),
                               ],
                             )
                           ],
@@ -1846,8 +1866,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                       child: Container(
                         child: DropdownButtonFormField<String>(
                           value: prefixname_customer_text,
-                          // icon: const Icon(Icons.arrow_drop_down),
-                          // elevation: 16,
                           decoration: InputDecoration(
                             errorStyle: TextStyle(fontSize: 12),
                             contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
@@ -1855,7 +1873,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               borderRadius: BorderRadius.circular(30.0),
                             ),
                           ),
-                          // style: const TextStyle(color: Colors.deepPurple),
                           hint: Text(
                             "คำนำหน้าชื่อ",
                             style: MyConstant().normalStyle(),
