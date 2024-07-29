@@ -236,6 +236,19 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
           'images/logo_mc2.png',
           width: MediaQuery.of(context).size.width * 0.25,
         ),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(
+                color: Colors.white,
+                Icons.menu,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
       ),
       drawer: drawerStaff(sizeh),
       body: GestureDetector(
@@ -278,6 +291,9 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
       floatingActionButton: widget.level == "checker_runnig"
           ? FloatingActionButton(
               backgroundColor: Colors.amber[600],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
               onPressed: () => {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
                   return AddCheckerLog(widget.saka, widget.zone,
@@ -288,9 +304,16 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
                 )
               },
               tooltip: 'เพิ่มข้อมูล',
-              child: Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
             )
           : FloatingActionButton(
+              backgroundColor: MyConstant.dark_f,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
               onPressed: () => {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
                   return AddCheckerLog(widget.saka, widget.zone,
@@ -301,7 +324,10 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
                 )
               },
               tooltip: 'เพิ่มข้อมูล',
-              child: Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
             ),
     );
   }
@@ -349,10 +375,12 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
               ShowVersion(),
               new Divider(
                 height: 0,
+                color: Colors.grey[200],
               ),
               ShowProfile(idStaff),
               new Divider(
                 height: 0,
+                color: Colors.grey[200],
               ),
             ],
           ),

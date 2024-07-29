@@ -61,6 +61,8 @@ class _consider_jobState extends State<consider_job>
         break;
       case AppLifecycleState.detached:
         break;
+      case AppLifecycleState.hidden:
+      // TODO: Handle this case.
     }
   }
 
@@ -134,7 +136,8 @@ class _consider_jobState extends State<consider_job>
       builder: (context) => Container(
         padding: EdgeInsets.all(5),
         child: Stack(
-          clipBehavior: Clip.none, alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
           children: <Widget>[
             Container(
               width: double.infinity,

@@ -612,7 +612,7 @@ class _Edit_addressState extends State<Edit_address> {
         width: double.infinity,
         child: ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            primary: Color.fromRGBO(252, 186, 3, 1.0),
+            backgroundColor: Color.fromRGBO(252, 186, 3, 1.0),
           ),
           label: Text(
             "แก้ไข",

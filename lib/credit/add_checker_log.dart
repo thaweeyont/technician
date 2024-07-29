@@ -180,16 +180,16 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
       if (locationPermission == LocationPermission.denied) {
         locationPermission = await Geolocator.requestPermission();
         if (locationPermission == LocationPermission.deniedForever) {
-          alertLocationService(
-              context, 'ไม่อนุญาติแชร์ Location', 'โปรดแชร์ location');
+          alertLocationService(context, 'ไม่อนุญาติแชร์ Location1',
+              'โปรดแชร์ location เพื่อใช้งาน');
         } else {
           // Find LatLong
           findLatLng();
         }
       } else {
         if (locationPermission == LocationPermission.deniedForever) {
-          alertLocationService(
-              context, 'ไม่อนุญาติแชร์ Location', 'โปรดแชร์ location');
+          alertLocationService(context, 'ไม่อนุญาติแชร์ Location2',
+              'โปรดแชร์ location เพื่อใช้งาน');
         } else {
           // Find LatLong
           findLatLng();

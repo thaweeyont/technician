@@ -19,15 +19,24 @@ class ShowProfile extends StatelessWidget {
       },
       leading: Icon(
         Icons.account_circle,
-        size: size * 0.06,
+        size: size * 0.08,
       ),
       title: Text(
         "โปรไฟล์",
-        style: MyConstant().h2_5Style(),
+        style: TextStyle(
+          fontFamily: 'Prompt',
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Color.fromRGBO(27, 55, 120, 1.0),
+        ),
       ),
       subtitle: Text(
         "ข้อมูลส่วนตัว / แก้ไขข้อมูล",
-        style: MyConstant().h3Style(),
+        style: TextStyle(
+          fontFamily: 'Prompt',
+          fontSize: 12,
+          color: Color.fromRGBO(27, 55, 120, 1.0),
+        ),
       ),
     );
   }

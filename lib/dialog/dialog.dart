@@ -63,7 +63,11 @@ Future<Null> normalDialog(
           ),
         ),
         title: ListTile(
-          leading: Image.asset('images/error_log.gif'),
+          // leading: Image.asset('images/error_log.gif'),
+          leading: Icon(
+            Icons.error_outline,
+            size: 40,
+          ),
           title: Text(title, style: MyConstant().h2_5Style()),
           subtitle: Text(message, style: MyConstant().normalStyle()),
         ),
@@ -147,9 +151,9 @@ Future<Null> alertLocationService(
         children: [
           TextButton(
             onPressed: () async {
-              // Navigator.pop(context);
-              await Geolocator.openLocationSettings();
-              exit(0);
+              Navigator.pop(context);
+              // await Geolocator.openLocationSettings();
+              // exit(0);
             },
             child: Column(
               children: [

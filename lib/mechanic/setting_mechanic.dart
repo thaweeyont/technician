@@ -339,7 +339,7 @@ class _SettingMechanicState extends State<SettingMechanic> {
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: MyConstant.dark_f,
+                                backgroundColor: MyConstant.dark_f,
                               ),
                               label: Text(
                                 "ยืนยันเปลี่ยนช่างติดตั้ง",

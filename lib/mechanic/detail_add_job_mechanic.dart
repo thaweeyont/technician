@@ -589,7 +589,7 @@ class _DetailAddJobMechanicState extends State<DetailAddJobMechanic> {
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: MyConstant.dark_f,
+                                backgroundColor: MyConstant.dark_f,
                               ),
                               label: Text(
                                 "บันทึกข้อมูลจำนวนสินค้า",

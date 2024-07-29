@@ -139,6 +139,7 @@ class _LoginState extends State<Login> {
         appBar: AppBar(
           centerTitle: true,
           elevation: 0,
+          backgroundColor: MyConstant.dark_f,
         ),
         body: Container(
           width: double.infinity,

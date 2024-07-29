@@ -623,7 +623,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                               margin: EdgeInsets.only(top: 15, bottom: 10),
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  primary: MyConstant.dark_f,
+                                  backgroundColor: MyConstant.dark_f,
                                 ),
                                 label: Text(
                                   "บันทึกข้อมูลสินค้า",
@@ -937,7 +937,8 @@ class _Log_AdduserState extends State<Log_Adduser> {
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: Color.fromRGBO(252, 186, 3, 1.0),
+                                backgroundColor:
+                                    Color.fromRGBO(252, 186, 3, 1.0),
                               ),
                               label: Text(
                                 "แก้ไขข้อมูลสินค้า",
@@ -1054,7 +1055,7 @@ class _Log_AdduserState extends State<Log_Adduser> {
                 },
                 child: SafeArea(
                   child: Scrollbar(
-                    isAlwaysShown: true,
+                    thumbVisibility: true,
                     child: ListView(
                       physics: const BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics()),

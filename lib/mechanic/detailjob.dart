@@ -114,6 +114,8 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
     }
   }
 
@@ -1904,7 +1906,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                                   height: size * 0.09,
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      primary: status_go_install == true
+                                      backgroundColor: status_go_install == true
                                           ? Color.fromRGBO(27, 55, 120, 1.0)
                                           : Colors.grey[400],
                                     ),
@@ -2175,7 +2177,7 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                               ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(27, 55, 120, 1.0),
+                                  backgroundColor: Color.fromRGBO(27, 55, 120, 1.0),
                                 ),
                                 label: Text(
                                   "แสกน",

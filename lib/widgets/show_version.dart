@@ -198,7 +198,7 @@ class _ShowVersionState extends State<ShowVersion> {
       },
       leading: Icon(
         Icons.info_outline,
-        size: size * 0.06,
+        size: size * 0.08,
       ),
       title: Text(
         "เวอร์ชั่นแอป",

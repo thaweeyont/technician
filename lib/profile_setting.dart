@@ -72,6 +72,7 @@ class _ProfileSettingState extends State<ProfileSetting> {
     double sizeh = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: MyConstant.dark_f,
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -232,7 +233,7 @@ class _ProfileSettingState extends State<ProfileSetting> {
       );
 
   Widget submit(size) => Padding(
-      padding: EdgeInsets.only(left: 35, right: 35),
+      padding: EdgeInsets.only(left: 20, right: 20),
       child: Container(
         decoration: ShapeDecoration(
           shape: const StadiumBorder(),

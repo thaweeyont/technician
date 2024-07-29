@@ -83,6 +83,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         break;
+      case AppLifecycleState.hidden:
     }
   }
 

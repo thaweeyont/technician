@@ -21,7 +21,7 @@ class ShowSignOut extends StatelessWidget {
             },
             leading: Icon(
               Icons.exit_to_app,
-              size: size * 0.06,
+              size: size * 0.08,
               color: Colors.white,
             ),
             title: Text(
@@ -30,7 +30,7 @@ class ShowSignOut extends StatelessWidget {
             ),
             subtitle: Text(
               "ออกจากระบบเพื่อไปหน้า login",
-              style: MyConstant().normalwhiteStyle(),
+              style: MyConstant().smallwhiteStyle(),
             ),
           ),
           decoration: BoxDecoration(

@@ -15,9 +15,7 @@ import 'package:technician/models/checkuser.dart';
 import 'package:technician/models/product_job.dart';
 import 'package:technician/sale/addlocation.dart';
 import 'package:technician/utility/my_constant.dart';
-import 'package:technician/widgets/show_progress.dart';
 import 'package:http/http.dart' as http;
-import 'package:technician/widgets/show_title.dart';
 
 class Adduser extends StatefulWidget {
   Adduser({Key? key}) : super(key: key);
@@ -581,7 +579,7 @@ class _AdduserState extends State<Adduser> {
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: MyConstant.dark_f,
+                                backgroundColor: MyConstant.dark_f,
                               ),
                               label: Text(
                                 "บันทึกข้อมูลสินค้า",
@@ -895,7 +893,7 @@ class _AdduserState extends State<Adduser> {
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: Color.fromRGBO(252, 186, 3, 1.0),
+                                backgroundColor: Color.fromRGBO(252, 186, 3, 1.0),
                               ),
                               label: Text(
                                 "แก้ไขข้อมูลสินค้า",

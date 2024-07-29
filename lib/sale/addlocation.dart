@@ -734,7 +734,7 @@ class _AddlocationState extends State<Addlocation> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(91, 117, 178, 1.0),
+                                  backgroundColor: Color.fromRGBO(91, 117, 178, 1.0),
                                 ),
                                 label: Text(
                                   "บันทึก",
@@ -1246,7 +1246,7 @@ class _AddlocationState extends State<Addlocation> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(252, 186, 3, 1.0),
+                                  backgroundColor: Color.fromRGBO(252, 186, 3, 1.0),
                                 ),
                                 label: Text(
                                   "แก้ไข",

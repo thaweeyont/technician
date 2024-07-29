@@ -1,28 +1,19 @@
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:technician/dialog/dialog.dart';
-import 'package:technician/mechanic/detail_history.dart';
 import 'package:technician/mechanic/homt.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/ipconfig.dart';
 import 'package:technician/models/detail_product_mechanicmodel.dart';
 import 'package:technician/models/history_end_jobmodel.dart';
-import 'package:technician/models/historymodel.dart';
 import 'package:technician/models/image_install_endmodel.dart';
 import 'package:technician/models/job_log_addressmodel.dart';
 import 'package:technician/utility/my_constant.dart';
-import 'package:technician/widgets/show_profile.dart';
 import 'package:technician/widgets/show_progress.dart';
-import 'package:technician/widgets/show_signout.dart';
-import 'package:technician/widgets/show_version.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class History extends StatefulWidget {
@@ -729,7 +720,7 @@ class _HistoryState extends State<History> {
               child: Scrollbar(
                 radius: Radius.circular(30),
                 thickness: 6,
-                isAlwaysShown: true,
+                thumbVisibility: true,
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),

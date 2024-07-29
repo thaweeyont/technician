@@ -581,7 +581,7 @@ class _Add_addressState extends State<Add_address> {
         padding: EdgeInsets.only(left: 15, right: 15),
         width: double.infinity,
         child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(primary: MyConstant.dark_f),
+          style: ElevatedButton.styleFrom(backgroundColor: MyConstant.dark_f),
           label: Text(
             "บันทึก",
             style: MyConstant().normalwhiteStyle(),
