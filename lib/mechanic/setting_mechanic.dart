@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/mechanic/homt.dart';
@@ -23,7 +23,6 @@ class _SettingMechanicState extends State<SettingMechanic> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _dropdown_mec();
   }

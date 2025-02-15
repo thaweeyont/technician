@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:technician/ipconfig.dart';
 import 'package:technician/models/job_log_addressmodel.dart';
@@ -692,7 +691,6 @@ class _jobHistoryState extends State<jobHistory> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _get_job_history(widget.id_staff);
   }

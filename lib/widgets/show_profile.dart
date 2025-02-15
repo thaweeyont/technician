@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:technician/profile_setting.dart';
-import 'package:technician/utility/my_constant.dart';
 
 class ShowProfile extends StatelessWidget {
   final idstaff;
@@ -10,7 +9,6 @@ class ShowProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-    var sizeh = MediaQuery.of(context).size.height;
     return ListTile(
       onTap: () {
         Navigator.push(context, CupertinoPageRoute(builder: (context) {

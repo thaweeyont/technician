@@ -25,6 +25,7 @@ class _LoginState extends State<Login> {
       branch_name,
       idStaff,
       name_staff,
+      levelStatus,
       status_show;
   //ประกาศตัวแปร
   TextEditingController id_staff = TextEditingController();
@@ -62,7 +63,6 @@ class _LoginState extends State<Login> {
       ));
       if (respose.statusCode == 200) {
         var status = json.decode(respose.body);
-
         if (status['status'] == 200) {
           data_checker_log = status['data'];
           setState(() {});
@@ -70,17 +70,27 @@ class _LoginState extends State<Login> {
           var saka = data_checker_log[0]['saka'];
           var name_user = data_checker_log[0]['name_user'];
           var level = data_checker_log[0]['level_status'];
+          var status_user = data_checker_log[0]['status_user'];
           var ip_conn = ipconfig_checker_office;
-          print("========>office");
+          print("========>no_office");
           if (respose.body != 'error') {
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
             preferences.setString('idstaff', idstaff!);
             preferences.setString('name_staff', name_user!);
-            Navigator.push(context, CupertinoPageRoute(builder: (context) {
-              return Home_Checker_log(
-                  zone!, saka!, name_user!, level!, ip_conn);
-            }));
+            preferences.setString('statusUser', status_user!);
+            if (status_user == '0') {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Home_Checker_log(
+                        zone!, saka!, name_user!, level!, ip_conn)),
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              normalDialog(
+                  context, 'แจ้งเตือน', "ขออภัยรหัสนี้ไม่มีสิทธิ์เข้าใช้งาน");
+            }
           } else {
             Navigator.pop(context);
             normalDialog(context, 'Error',
@@ -91,7 +101,6 @@ class _LoginState extends State<Login> {
         }
       }
     } catch (e) {
-      // print("ไม่มีข้อมูล");
       var respose = await http.get(Uri.http(ipconfig_checker_office,
           '/CheckerData2/api/Login.php', {"pws_us": idstaff}));
       if (respose.statusCode == 200) {
@@ -104,6 +113,7 @@ class _LoginState extends State<Login> {
           var saka = data_checker_log[0]['saka'];
           var name_user = data_checker_log[0]['name_user'];
           var level = data_checker_log[0]['level_status'];
+          var status_user = data_checker_log[0]['status_user'];
           var ip_conn = ipconfig_checker_office;
           print("========>office");
           if (respose.body != 'error') {
@@ -111,10 +121,25 @@ class _LoginState extends State<Login> {
                 await SharedPreferences.getInstance();
             preferences.setString('idstaff', idstaff!);
             preferences.setString('name_staff', name_user!);
-            Navigator.push(context, CupertinoPageRoute(builder: (context) {
-              return Home_Checker_log(
-                  zone!, saka!, name_user!, level!, ip_conn);
-            }));
+            preferences.setString('statusUser', status_user!);
+            if (status_user == '0') {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home_Checker_log(
+                    zone!,
+                    saka!,
+                    name_user!,
+                    level!,
+                    ip_conn,
+                  ),
+                ),
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              normalDialog(
+                  context, 'แจ้งเตือน', "ขออภัยรหัสนี้ไม่มีสิทธิ์เข้าใช้งาน");
+            }
           } else {
             Navigator.pop(context);
             normalDialog(context, 'Error',
@@ -131,103 +156,174 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
     var sizeh = MediaQuery.of(context).size.height;
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: MyConstant.dark_f,
-        ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                MyConstant.dark_f,
-                MyConstant.dark_e,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp,
-            ),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: size * 0.28,
-                child: Container(
-                  child: Column(
-                    children: [
-                      logo(size),
-                    ],
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     centerTitle: true,
+    //     elevation: 0,
+    //     backgroundColor: MyConstant.dark_f,
+    //   ),
+    //   body: Container(
+    //     width: double.infinity,
+    //     height: double.infinity,
+    //     decoration: BoxDecoration(
+    //       gradient: LinearGradient(
+    //         colors: [
+    //           MyConstant.dark_f,
+    //           MyConstant.dark_e,
+    //         ],
+    //         begin: Alignment.topCenter,
+    //         end: Alignment.bottomCenter,
+    //         stops: [0.0, 1.0],
+    //         tileMode: TileMode.clamp,
+    //       ),
+    //     ),
+    //     child: Stack(
+    //       alignment: Alignment.center,
+    //       children: [
+    //         Positioned(
+    //           top: size * 0.28,
+    //           child: Container(
+    //             child: Column(
+    //               children: [
+    //                 logo(size),
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //         Positioned(
+    //           top: size * 0.65,
+    //           child: Container(
+    //             width: MediaQuery.of(context).size.width * 0.798,
+    //             height: MediaQuery.of(context).size.height * 0.15,
+    //             decoration: BoxDecoration(
+    //               color: Color.fromARGB(255, 231, 231, 231),
+    //               borderRadius: BorderRadius.circular(25),
+    //               boxShadow: [
+    //                 BoxShadow(
+    //                   color: Color.fromARGB(255, 43, 43, 4).withAlpha(130),
+    //                   spreadRadius: 0.8,
+    //                   blurRadius: 20,
+    //                   offset: const Offset(0, 7),
+    //                 )
+    //               ],
+    //             ),
+    //             child: Column(
+    //               children: [
+    //                 Padding(
+    //                   padding: const EdgeInsets.all(10.0),
+    //                   child: Text(
+    //                     'เข้าสู่ระบบ',
+    //                     style: MyConstant().text(),
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //         Positioned(
+    //           top: size * 0.75,
+    //           child: Container(
+    //             width: MediaQuery.of(context).size.width * 0.8,
+    //             decoration: BoxDecoration(
+    //               color: Colors.white,
+    //               borderRadius: BorderRadius.circular(25),
+    //               boxShadow: [
+    //                 BoxShadow(
+    //                   color: Color.fromARGB(255, 43, 43, 43).withAlpha(130),
+    //                   spreadRadius: 0.8,
+    //                   blurRadius: 20,
+    //                   offset: const Offset(0, 7),
+    //                 )
+    //               ],
+    //             ),
+    //             child: Column(
+    //               children: [
+    //                 SizedBox(height: 20),
+    //                 input_staff(size),
+    //                 SizedBox(height: 10),
+    //                 button(size, sizeh, context),
+    //                 SizedBox(height: 30),
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: const Color.fromARGB(242, 246, 249, 255),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        behavior: HitTestBehavior.opaque,
+        child: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(60),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color:
+                        const Color.fromARGB(255, 194, 194, 194).withAlpha(130),
+                    spreadRadius: 0.2,
+                    blurRadius: 7,
+                    offset: const Offset(0, 1),
                   ),
+                ],
+                gradient: LinearGradient(
+                  colors: [
+                    MyConstant.dark_f,
+                    const Color.fromRGBO(62, 105, 201, 1),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp,
                 ),
               ),
-              Positioned(
-                top: size * 0.65,
+            ),
+            Center(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.798,
-                  height: MediaQuery.of(context).size.height * 0.15,
+                  height: 350,
+                  margin: const EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 231, 231, 231),
-                    borderRadius: BorderRadius.circular(25),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
-                        spreadRadius: 0.8,
-                        blurRadius: 20,
-                        offset: const Offset(0, 7),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          'เข้าสู่ระบบ',
-                          style: MyConstant().text(),
-                        ),
+                        color: Colors.grey.withAlpha(130),
+                        spreadRadius: 0.2,
+                        blurRadius: 7,
+                        offset: const Offset(0, 1),
                       ),
                     ],
                   ),
-                ),
-              ),
-              Positioned(
-                top: size * 0.75,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
-                        spreadRadius: 0.8,
-                        blurRadius: 20,
-                        offset: const Offset(0, 7),
-                      )
-                    ],
-                  ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: 20),
+                      Image.asset(
+                        'images/TWYLOGO.png',
+                        height: MediaQuery.of(context).size.height * 0.08,
+                      ),
+                      SizedBox(height: 50),
                       input_staff(size),
                       SizedBox(height: 10),
                       button(size, sizeh, context),
-                      SizedBox(height: 30),
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -235,20 +331,23 @@ class _LoginState extends State<Login> {
 
   Container button(double size, double sizeh, BuildContext context) {
     return Container(
-      width: size * 0.35,
-      height: sizeh * 0.05,
+      // width: size * 0.35,
+      // height: sizeh * 0.05,
+      padding: EdgeInsets.symmetric(horizontal: 10),
       child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 20),
         decoration: ShapeDecoration(
           shape: const StadiumBorder(),
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(62, 105, 201, 1),
-              Color.fromRGBO(27, 55, 120, 1.0)
-            ],
-          ),
+          color: Color.fromRGBO(62, 105, 201, 1),
+          // gradient: LinearGradient(
+          //   colors: [
+          //     Color.fromRGBO(62, 105, 201, 1),
+          //     Color.fromRGBO(27, 55, 120, 1.0)
+          //   ],
+          // ),
           shadows: [
             BoxShadow(
-              color: Color.fromARGB(255, 150, 150, 150).withOpacity(0.7),
+              color: Color.fromARGB(255, 150, 150, 150).withAlpha(130),
               spreadRadius: 1,
               blurRadius: 8,
               offset: const Offset(0, 5),
@@ -289,9 +388,9 @@ class _LoginState extends State<Login> {
 
   Container input_staff(double size) {
     return Container(
-      padding: EdgeInsets.all(15),
+      padding: EdgeInsets.all(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 20),
         decoration: BoxDecoration(
           color: Color.fromARGB(131, 228, 228, 228),
           borderRadius: BorderRadius.all(
@@ -340,7 +439,7 @@ class _LoginState extends State<Login> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Color.fromARGB(255, 43, 43, 43).withOpacity(0.7),
+            color: Color.fromARGB(255, 43, 43, 43).withAlpha(130),
             spreadRadius: 0.8,
             blurRadius: 20,
             offset: const Offset(0, 7),

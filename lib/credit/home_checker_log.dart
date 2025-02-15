@@ -10,6 +10,7 @@ import 'package:technician/credit/add_checker_log.dart';
 import 'package:technician/credit/edit_Checker_log.dart';
 import 'package:technician/dialog/dialog.dart';
 import 'package:technician/ipconfig_checkerlog.dart';
+import 'package:technician/login.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:http/http.dart' as http;
 
@@ -32,26 +33,51 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
       branch_name,
       idStaff,
       name_staff,
-      status_show;
+      levelStatus,
+      status_show,
+      status_user;
   double? lat, lng;
   String position = '';
   final f = new DateFormat('dd/MM/yyyy');
   List data_customer = [], dataAddress = [];
   TextEditingController search = TextEditingController();
+  var checkJob = '';
+
   @override
   void initState() {
     super.initState();
     getprofile_staff();
     CheckPermission();
     checker_log(widget.zone, widget.saka, widget.name_user);
+
+    print(widget.level);
   }
 
   Future<void> getprofile_staff() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      idStaff = preferences.getString('idstaff');
-      name_staff = preferences.getString('name_staff');
+      idStaff = preferences.getString('idstaff') ?? '';
+      name_staff = preferences.getString('name_staff') ?? '';
+      status_user = preferences.getString('statusUser') ?? '';
     });
+  }
+
+  checkJobPosition(position) {
+    switch (position) {
+      case 'chief':
+        checkJob = 'ผจก.เช็คเกอร์';
+        break;
+      case 'checker_runnig':
+        checkJob = 'ธุรการเช็คเกอร์';
+        break;
+      case 'checker':
+        checkJob = 'พนักงานเช็คเกอร์';
+        break;
+      default:
+        checkJob = '-';
+        break;
+    }
+    return checkJob;
   }
 
   // CheckPermission
@@ -114,8 +140,14 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
           await placemarkFromCoordinates(latitude, longitude);
       if (placemarks != 'null' && placemarks.isNotEmpty) {
         Placemark placemark = placemarks[0];
-        String address =
-            '${placemark.subLocality}, ${placemark.locality}, ${placemark.administrativeArea}, ${placemark.postalCode}';
+        String address = [
+          placemark.subLocality,
+          placemark.locality,
+          placemark.administrativeArea,
+          placemark.postalCode
+        ].where((element) => element != null && element.isNotEmpty).join(', ');
+        // String address =
+        //     '${placemark.subLocality}, ${placemark.locality}, ${placemark.administrativeArea}, ${placemark.postalCode}';
         return address;
       }
     } catch (e) {
@@ -172,7 +204,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
           setState(() {
             data_customer = status['data'];
           });
-          print('${data_customer[0]['G1_Fname']}');
+          // print('${data_customer[0]['G1_Fname']}');
         }
       } else {
         normalDialog(context, 'Error', "check error");
@@ -257,12 +289,15 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
           onRefresh: () async {
             setState(() {
               checker_log(widget.zone, widget.saka, widget.name_user);
+              getprofile_staff();
             });
           },
+          color: Colors.grey[500],
+          backgroundColor: Colors.white,
           child: Column(
             children: [
               search_running(size, sizeh),
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               Expanded(
                 child: ListView(
                   shrinkWrap: true,
@@ -345,7 +380,7 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
                   style: MyConstant().h2_5whiteStyle(),
                 ),
                 accountEmail: Text(
-                  "พนักงานสินเชื่อ",
+                  checkJobPosition(widget.level),
                   style: MyConstant().normalwhiteStyle(),
                 ),
                 currentAccountPicture: ClipRRect(
@@ -353,19 +388,20 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
                   child: Icon(
                     Icons.account_circle,
                     color: Colors.white,
-                    size: sizeh * 0.07,
+                    size: sizeh * 0.08,
                   ),
                 ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [
-                        const Color.fromRGBO(27, 55, 120, 1.0),
-                        const Color.fromRGBO(62, 105, 201, 1),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
+                    colors: [
+                      const Color.fromRGBO(27, 55, 120, 1.0),
+                      const Color.fromRGBO(62, 105, 201, 1),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0.0, 1.0],
+                    tileMode: TileMode.clamp,
+                  ),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(15),
                     bottomRight: Radius.circular(15),
@@ -389,273 +425,313 @@ class _Home_Checker_logState extends State<Home_Checker_log> {
     );
   }
 
-  Widget search_running(size, sizeh) => Stack(
-        children: [
-          Positioned(
-            child: Container(
-              // padding: EdgeInsets.only(top: 0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
-                ),
-                gradient: LinearGradient(
-                  colors: [
-                    const Color.fromRGBO(27, 55, 120, 1.0),
-                    const Color.fromRGBO(62, 105, 201, 1),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp,
-                ),
+  Widget search_running(size, sizeh) {
+    return Stack(
+      children: [
+        Positioned(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
               ),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 15, right: 15),
-                    child: Row(
-                      children: [
-                        Text(
-                          "สวัสดีคุณ $name_staff",
-                          style: MyConstant().h2whiteStyle(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.place,
-                          color: Colors.red,
-                          size: MediaQuery.of(context).size.width * 0.05,
-                        ),
-                        Text(
-                          '$position',
-                          style: MyConstant().smallwhiteStyle(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 15),
-                    child: Row(
-                      children: [
-                        Text(
-                          "ค้นหาเอกสารสัญญา",
-                          style: MyConstant().h2_5whiteStyle(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20),
-                        ),
-                      ),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              style: MyConstant().normalStyle(),
-                              controller: search,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                hintText: "กรอกเลขรันนิ่งสัญญา",
-                                hintStyle: MyConstant().normalStyle(),
-                                border: InputBorder.none,
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  color: Colors.black.withAlpha(120),
-                                ),
-                              ),
-                              onChanged: (String keyword) {
-                                if (keyword == "") {
-                                  checker_log(widget.zone, widget.saka,
-                                      widget.name_user);
-                                } else {
-                                  filter_checker_log(widget.zone, widget.saka,
-                                      keyword, widget.name_user);
-                                }
-                              },
-                            ),
-                          ),
-                          // IconButton(
-                          //   onPressed: () {},
-                          //   icon: Icon(
-                          //     Icons.search,
-                          //     color: Colors.black.withAlpha(120),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                  ),
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromRGBO(27, 55, 120, 1.0),
+                  const Color.fromRGBO(62, 105, 201, 1),
                 ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp,
               ),
             ),
-          ),
-        ],
-      );
-
-  Widget detail(size, sizeh) => Column(
-        children: [
-          for (var i = 0; i < data_customer.length; i++) ...[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: InkWell(
-                onTap: () async {},
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+            width: double.infinity,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 15, right: 15),
+                  child: Row(
+                    children: [
+                      Text(
+                        "สวัสดีคุณ $name_staff",
+                        style: MyConstant().h2whiteStyle(),
+                      ),
+                    ],
                   ),
-                  elevation: 1,
-                  color: Colors.white,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.feed_outlined,
-                                  color: Color.fromRGBO(27, 55, 120, 1.0),
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  "${data_customer[i]['running_id']}",
-                                  style: MyConstant().h3Style(),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              "${f.format(DateTime.parse(data_customer[i]['date_insert']))} : ${data_customer[i]['time_insert']}",
-                              style: MyConstant().normalStyle(),
-                            ),
-                          ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.place,
+                        color: Colors.red,
+                        size: MediaQuery.of(context).size.width * 0.05,
+                      ),
+                      Text(
+                        '$position',
+                        style: MyConstant().smallwhiteStyle(),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 15),
+                  child: Row(
+                    children: [
+                      Text(
+                        "ค้นหาเอกสารสัญญา",
+                        style: MyConstant().h2_5whiteStyle(),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 6, right: 6, top: 6, bottom: 10),
+                  child: TextField(
+                    style: MyConstant().normalStyle(),
+                    controller: search,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(8),
+                      hintText: "กรอกเลขรันนิ่งสัญญา",
+                      hintStyle: MyConstant().normalStyle(),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.black.withAlpha(120),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide(
+                          color: Colors.white,
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
+                      ),
+                    ),
+                    onChanged: (String keyword) {
+                      if (keyword == "") {
+                        checker_log(widget.zone, widget.saka, widget.name_user);
+                      } else {
+                        filter_checker_log(widget.zone, widget.saka, keyword,
+                            widget.name_user);
+                      }
+                    },
+                  ),
+                ),
+                // Container(
+                //   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                //   child: Container(
+                //     padding: EdgeInsets.symmetric(horizontal: 0),
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       borderRadius: BorderRadius.all(
+                //         Radius.circular(20),
+                //       ),
+                //     ),
+                //     child: Row(
+                //       children: <Widget>[
+                //         Expanded(
+                //           child: TextField(
+                //             style: MyConstant().normalStyle(),
+                //             controller: search,
+                //             keyboardType: TextInputType.number,
+                //             decoration: InputDecoration(
+                //               contentPadding:
+                //                   EdgeInsets.fromLTRB(20, 5, 10, 5),
+                //               hintText: "กรอกเลขรันนิ่งสัญญา",
+                //               hintStyle: MyConstant().normalStyle(),
+                //               // labelText: "กรอกเลขรันนิ่งสัญญา",
+                //               // labelStyle: MyConstant().normalStyle(),
+                //               border: InputBorder.none,
+                //               prefixIcon: Icon(
+                //                 Icons.search,
+                //                 color: Colors.black.withAlpha(120),
+                //               ),
+                //             ),
+                //             onChanged: (String keyword) {
+                //               if (keyword == "") {
+                //                 checker_log(widget.zone, widget.saka,
+                //                     widget.name_user);
+                //               } else {
+                //                 filter_checker_log(widget.zone, widget.saka,
+                //                     keyword, widget.name_user);
+                //               }
+                //             },
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget detail(size, sizeh) {
+    return Column(
+      children: [
+        for (var i = 0; i < data_customer.length; i++) ...[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: InkWell(
+              onTap: () async {},
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                elevation: 1,
+                color: Colors.white,
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              SizedBox(
-                                height: sizeh * 0.01,
+                              Icon(
+                                Icons.feed_outlined,
+                                color: Color.fromRGBO(27, 55, 120, 1.0),
                               ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "ชื่อลูกค้า : ${data_customer[i]['cus_prefix']}${data_customer[i]['cus_name']} ${data_customer[i]['cus_lastname']}",
-                                      style: MyConstant().h3Style(),
-                                      overflow: TextOverflow.fade,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 3),
-                              val_kam(data_customer: data_customer, i: i),
-                              SizedBox(height: 3),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "สถานะ : ${data_customer[i]['status']}",
-                                        style: MyConstant().h3Style(),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextButton(
-                                        style: TextButton.styleFrom(
-                                          textStyle:
-                                              MyConstant().normalyelloStyle(),
-                                        ),
-                                        onPressed: () {
-                                          if (data_customer[i]['id_user']
-                                                  .toString()
-                                                  .isNotEmpty &&
-                                              data_customer[i]['running_id']
-                                                  .toString()
-                                                  .isNotEmpty &&
-                                              data_customer[i]['type_running']
-                                                  .toString()
-                                                  .isNotEmpty) {
-                                            Navigator.push(context,
-                                                CupertinoPageRoute(
-                                                    builder: (context) {
-                                              return EditCheckerLog(
-                                                  data_customer[i]['id_user'],
-                                                  data_customer[i]['saka'],
-                                                  data_customer[i]['zone'],
-                                                  widget.name_user,
-                                                  widget.ip_conn,
-                                                  data_customer[i]
-                                                      ['running_id'],
-                                                  data_customer[i]
-                                                      ['type_running'],
-                                                  widget.level);
-                                            })).then((value) => checker_log(
-                                                widget.zone,
-                                                widget.saka,
-                                                widget.name_user));
-                                            search.clear();
-                                          } else {
-                                            print("empty");
-                                          }
-                                        },
-                                        child: data_customer[i]['status'] ==
-                                                    "ตรวจสอบสัญญาเรียบร้อย" ||
-                                                data_customer[i]['status'] ==
-                                                    "ตรวจสอบเสร็จสิ้น"
-                                            ? Text(
-                                                'ดูข้อมูล',
-                                                style: MyConstant()
-                                                    .normaldarkStyle(),
-                                              )
-                                            : Text(
-                                                'แก้ไข',
-                                                style: MyConstant()
-                                                    .normalyelloStyle(),
-                                              ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              SizedBox(width: 5),
+                              Text(
+                                "${data_customer[i]['running_id']}",
+                                style: MyConstant().h3Style(),
                               ),
                             ],
                           ),
-                        )
-                      ],
-                    ),
+                          Text(
+                            "${f.format(DateTime.parse(data_customer[i]['date_insert']))} : ${data_customer[i]['time_insert']}",
+                            style: MyConstant().normalStyle(),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: sizeh * 0.01,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "ชื่อลูกค้า : ${data_customer[i]['cus_prefix']}${data_customer[i]['cus_name']} ${data_customer[i]['cus_lastname']}",
+                                    style: MyConstant().h3Style(),
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 3),
+                            val_kam(data_customer: data_customer, i: i),
+                            SizedBox(height: 3),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "สถานะ : ${data_customer[i]['status']}",
+                                      style: MyConstant().h3Style(),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextButton(
+                                      style: TextButton.styleFrom(
+                                        textStyle:
+                                            MyConstant().normalyelloStyle(),
+                                      ),
+                                      onPressed: () {
+                                        final customer = data_customer[i];
+
+                                        // ตรวจสอบค่าที่จำเป็น
+                                        if ([
+                                          customer['id_user'],
+                                          customer['running_id'],
+                                          customer['type_running']
+                                        ].every((value) =>
+                                            value != null &&
+                                            value.toString().isNotEmpty)) {
+                                          // นำทางไปหน้า EditCheckerLog
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  EditCheckerLog(
+                                                customer['id_user'],
+                                                customer['saka'],
+                                                customer['zone'],
+                                                widget.name_user,
+                                                widget.ip_conn,
+                                                customer['running_id'],
+                                                customer['type_running'],
+                                                widget.level,
+                                              ),
+                                            ),
+                                          ).then((_) {
+                                            checker_log(widget.zone,
+                                                widget.saka, widget.name_user);
+                                          });
+
+                                          search.clear();
+                                        } else {
+                                          normalDialog(context, "แจ้งเตือน",
+                                              "ข้อมูลไม่ครบถ้วน กรุณาตรวจสอบอีกครั้ง");
+                                        }
+                                      },
+                                      child: data_customer[i]['status'] ==
+                                                  "ตรวจสอบสัญญาเรียบร้อย" ||
+                                              data_customer[i]['status'] ==
+                                                  "ตรวจสอบเสร็จสิ้น"
+                                          ? Text(
+                                              'ดูข้อมูล',
+                                              style: MyConstant()
+                                                  .normaldarkStyle(),
+                                            )
+                                          : Text(
+                                              'แก้ไข',
+                                              style: MyConstant()
+                                                  .normalyelloStyle(),
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
             ),
-          ]
-        ],
-      );
+          ),
+        ]
+      ],
+    );
+  }
 }
 
 class val_kam extends StatelessWidget {

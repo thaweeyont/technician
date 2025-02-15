@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:technician/login.dart';
 import 'package:technician/utility/my_constant.dart';
@@ -10,7 +10,6 @@ class ShowSignOut extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-    var sizeh = MediaQuery.of(context).size.height;
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -65,7 +64,6 @@ class ShowSignOut extends StatelessWidget {
             ),
           ),
           title: ListTile(
-            // leading: Image.asset('images/error_log.gif'),
             leading: Icon(
               Icons.exit_to_app,
               size: size * 0.1,
@@ -80,11 +78,6 @@ class ShowSignOut extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () async {
-                    // SharedPreferences preferences =
-                    //     await SharedPreferences.getInstance();
-                    // preferences.clear().then((value) => Navigator.of(context)
-                    //     .pushReplacement(
-                    //         MaterialPageRoute(builder: (context) => Login())));
                     SharedPreferences preferences =
                         await SharedPreferences.getInstance();
                     preferences.clear();

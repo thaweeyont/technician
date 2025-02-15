@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1437,7 +1437,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
         child: Column(
           children: [
             Container(
-              // margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
                 children: [
                   Container(
@@ -1449,7 +1448,6 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                       children: [
                         Icon(
                           Icons.feed_outlined,
-                          // color: Color.fromRGBO(27, 55, 120, 1.0),
                         ),
                         SizedBox(width: 5),
                         Text(
@@ -1466,9 +1464,9 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             Row(
               children: [
                 Checkbox(
-                  side: MaterialStateBorderSide.resolveWith(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.selected)) {
+                  side: WidgetStateBorderSide.resolveWith(
+                    (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
                         return const BorderSide(
                             color: Color.fromARGB(255, 0, 0, 0), width: 1.7);
                       }
@@ -1489,7 +1487,10 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                       checkDoc = 'false';
                     }
                     Checker_runing(
-                        selectedValue, id_running_text.text, checkDoc);
+                      selectedValue,
+                      id_running_text.text,
+                      checkDoc,
+                    );
                   },
                 ),
                 Text(
@@ -1552,6 +1553,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                                   ),
                             labelText: "เลขรันนิ่งสัญญา",
                             labelStyle: MyConstant().normalStyle(),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(360),
+                              ),
+                              borderSide: BorderSide(
+                                color: MyConstant
+                                    .dark, // สีของเส้น border เมื่อโฟกัส
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -1585,7 +1595,7 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
             ] else ...[
               Container(
                 padding: EdgeInsets.all(10),
-                color: Color.fromARGB(255, 228, 228, 228).withOpacity(0.3),
+                color: Color.fromARGB(255, 228, 228, 228).withAlpha(180),
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1637,56 +1647,102 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
   //ประเภทเอกสาร
   Row filtter_typerunnig(BuildContext context) {
     return Row(
-      // mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-          flex: 5,
+          // flex: 5,
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      width: 1.0,
-                      style: BorderStyle.solid,
-                      color: MyConstant.dark,
+                child: DropdownButtonFormField<String>(
+                  value: selectedValue,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 12),
+                    contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(30),
+                      ),
+                      borderSide: BorderSide(
+                        color: MyConstant.dark, // สีของเส้น border เมื่อโฟกัส
+                      ),
                     ),
                   ),
-                ),
-                child: DropdownButton(
-                  isExpanded: true,
                   hint: Text(
                     "ประเภทเอกสาร",
                     style: MyConstant().normalStyle(),
                   ),
-                  value: selectedValue,
-                  items: typerunnig.map((typelist) {
-                    return DropdownMenuItem(
-                        value: typelist['type_running'],
-                        child: Text(
-                          typelist['type_running'],
-                          style: MyConstant().h3Style(),
-                        ));
-                  }).toList(),
-                  onChanged: (value) {
+                  onChanged: (String? newValue) {
                     setState(() {
-                      selectedValue = value as String?;
+                      selectedValue = newValue;
                     });
                     if (id_running_text.text.toString().length == 6) {
                       Checker_runing(selectedValue,
                           id_running_text.text.toString(), checkDoc);
                     }
                   },
-                  underline: Container(
-                    height: 2,
-                    color: Colors.transparent,
-                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'กรุณาเพิ่ม ประเภทเอกสาร';
+                    }
+                    return null;
+                  },
+                  items: typerunnig.map((typelist) {
+                    return DropdownMenuItem<String>(
+                        value: typelist['type_running'],
+                        child: Text(
+                          typelist['type_running'],
+                          style: MyConstant().h3Style(),
+                        ));
+                  }).toList(),
                 ),
-              ),
+              )
+              // Container(
+              //   padding: EdgeInsets.symmetric(horizontal: 20),
+              //   decoration: ShapeDecoration(
+              //     shape: RoundedRectangleBorder(
+              //       side: BorderSide(
+              //         // width: 1.0,
+              //         // style: BorderStyle.solid,
+              //         color: Color.fromARGB(255, 121, 121, 121),
+              //       ),
+              //       borderRadius: BorderRadius.all(
+              //         Radius.circular(30.0),
+              //       ),
+              //     ),
+              //   ),
+              //   child: DropdownButton(
+              //     isExpanded: true,
+              //     hint: Text(
+              //       "ประเภทเอกสาร",
+              //       style: MyConstant().normalStyle(),
+              //     ),
+              //     value: selectedValue,
+              //     items: typerunnig.map((typelist) {
+              //       return DropdownMenuItem(
+              //           value: typelist['type_running'],
+              //           child: Text(
+              //             typelist['type_running'],
+              //             style: MyConstant().h3Style(),
+              //           ));
+              //     }).toList(),
+              //     onChanged: (value) {
+              //       setState(() {
+              //         selectedValue = value as String?;
+              //       });
+              //       if (id_running_text.text.toString().length == 6) {
+              //         Checker_runing(selectedValue,
+              //             id_running_text.text.toString(), checkDoc);
+              //       }
+              //     },
+              //     underline: Container(
+              //       height: 2,
+              //       color: Colors.transparent,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         )
@@ -1872,6 +1928,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(30),
+                              ),
+                              borderSide: BorderSide(
+                                color: MyConstant
+                                    .dark, // สีของเส้น border เมื่อโฟกัส
+                              ),
+                            ),
                           ),
                           hint: Text(
                             "คำนำหน้าชื่อ",
@@ -1925,6 +1990,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                           ),
                           labelText: "ชื่อ",
                           labelStyle: MyConstant().normalStyle(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(30),
+                            ),
+                            borderSide: BorderSide(
+                              color: MyConstant
+                                  .dark, // สีของเส้น border เมื่อโฟกัส
+                            ),
+                          ),
                         ),
                       ),
                     )
@@ -1952,6 +2026,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                           ),
                           labelText: "นามสกุล",
                           labelStyle: MyConstant().normalStyle(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(30),
+                            ),
+                            borderSide: BorderSide(
+                              color: MyConstant
+                                  .dark, // สีของเส้น border เมื่อโฟกัส
+                            ),
+                          ),
                         ),
                       ),
                     )
@@ -2352,6 +2435,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
@@ -2393,6 +2485,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               ),
                               labelText: "ชื่อ ผู้้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                           ),
                         )
@@ -2414,6 +2515,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               ),
                               labelText: "นามสกุล ผู้้ค้ำ 1",
                               labelStyle: MyConstant().normalStyle(),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                           ),
                         )
@@ -2688,6 +2798,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
@@ -2729,6 +2848,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               ),
                               labelText: "ชื่อ ผู้้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                           ),
                         )
@@ -2750,6 +2878,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               ),
                               labelText: "นามสกุล ผู้้ค้ำ 2",
                               labelStyle: MyConstant().normalStyle(),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                           ),
                         )
@@ -3024,6 +3161,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                             style: const TextStyle(color: Colors.deepPurple),
                             hint: Text(
@@ -3057,15 +3203,24 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                             style: MyConstant().h3Style(),
                             controller: name_kam3_text,
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.fromLTRB(30, 5, 10, 5),
-                              errorStyle: TextStyle(fontSize: 12),
-                              prefixIcon: Icon(Icons.location_history),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                              labelText: "ชื่อ ผู้้ค้ำ 3",
-                              labelStyle: MyConstant().normalStyle(),
-                            ),
+                                contentPadding:
+                                    EdgeInsets.fromLTRB(30, 5, 10, 5),
+                                errorStyle: TextStyle(fontSize: 12),
+                                prefixIcon: Icon(Icons.location_history),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                                labelText: "ชื่อ ผู้้ค้ำ 3",
+                                labelStyle: MyConstant().normalStyle(),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(30),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: MyConstant
+                                        .dark, // สีของเส้น border เมื่อโฟกัส
+                                  ),
+                                )),
                           ),
                         )
                       ],
@@ -3086,6 +3241,15 @@ class _AddCheckerLogState extends State<AddCheckerLog> {
                               ),
                               labelText: "นามสกุล ผู้้ค้ำ 3",
                               labelStyle: MyConstant().normalStyle(),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                borderSide: BorderSide(
+                                  color: MyConstant
+                                      .dark, // สีของเส้น border เมื่อโฟกัส
+                                ),
+                              ),
                             ),
                           ),
                         )

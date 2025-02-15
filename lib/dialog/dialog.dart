@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:technician/utility/my_constant.dart';
 import 'package:loading_gifs/loading_gifs.dart';
 
@@ -27,7 +24,7 @@ Future<void> showProgressLoading(BuildContext context) async {
     builder: (context) => Center(
       child: Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 24, 24, 24).withOpacity(0.9),
+          color: const Color.fromARGB(255, 24, 24, 24).withAlpha(180),
           borderRadius: const BorderRadius.all(
             Radius.circular(10),
           ),
@@ -37,10 +34,6 @@ Future<void> showProgressLoading(BuildContext context) async {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(cupertinoActivityIndicator, scale: 4),
-            // Text(
-            //   'Loading...',
-            //   style: MyConstant().textLoading(),
-            // ),
           ],
         ),
       ),

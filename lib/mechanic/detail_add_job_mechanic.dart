@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:technician/ipconfig.dart';
 import 'package:technician/mechanic/detail_product_mechanic.dart';
 import 'package:technician/mechanic/detail_product_mechanic_multi.dart';
@@ -27,7 +27,6 @@ class _DetailAddJobMechanicState extends State<DetailAddJobMechanic> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getdatauser();
     _getAddress();

@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -110,12 +110,10 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
         //ทำงานบนพื้นหลัง
-
         break;
       case AppLifecycleState.detached:
         break;
       case AppLifecycleState.hidden:
-        // TODO: Handle this case.
     }
   }
 
@@ -2177,7 +2175,8 @@ class _detailjobState extends State<detailjob> with WidgetsBindingObserver {
                               ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color.fromRGBO(27, 55, 120, 1.0),
+                                  backgroundColor:
+                                      Color.fromRGBO(27, 55, 120, 1.0),
                                 ),
                                 label: Text(
                                   "แสกน",

@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +24,8 @@ import 'package:technician/widgets/show_admin_mechanic.dart';
 import 'package:technician/widgets/show_profile.dart';
 import 'package:technician/widgets/show_signout.dart';
 import 'package:technician/widgets/show_version.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class Home extends StatefulWidget {
   Home({Key? key}) : super(key: key);
@@ -58,7 +60,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       FlutterLocalNotificationsPlugin();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
     st_notification();
@@ -163,12 +164,43 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   //แสดงแจ้งเตื่อนถึงเวลาปิดงานแบบตั้งเวลา
+  // Future<void> show_notification_delay() async {
+  //   timer = Timer.periodic(Duration(minutes: 1), (Timer t) async {
+  //     DateTime now = DateTime.now(); // 30/09/2021 15:54:30
+  //     var hours = now.hour;
+  //     var minute = now.minute;
+  //     var timeDelayed = DateTime.now().add(Duration(seconds: 1));
+  //     const AndroidNotificationDetails androidNotificationDetails =
+  //         AndroidNotificationDetails('nextflow_noti_001', 'แจ้งเตือนทั่วไป',
+  //             importance: Importance.max,
+  //             priority: Priority.high,
+  //             ticker: 'ticker');
+  //     const NotificationDetails platformChannelDetails = NotificationDetails(
+  //       android: androidNotificationDetails,
+  //     );
+  //     await flutterLocalNotificationsPlugin.schedule(
+  //         0,
+  //         'แจ้งเตือน',
+  //         'เวลา $hours:$minute นาที อย่าลืมปิดรับงานขอบคุณครับ',
+  //         timeDelayed,
+  //         platformChannelDetails);
+  //   });
+  // }
+
+// แสดงแจ้งเตือนถึงเวลาปิดงานแบบตั้งเวลา
   Future<void> show_notification_delay() async {
+    // เริ่มต้นการตั้งค่า timezone
+    tz.initializeTimeZones();
+
     timer = Timer.periodic(Duration(minutes: 1), (Timer t) async {
-      DateTime now = DateTime.now(); // 30/09/2021 15:54:30
+      DateTime now = DateTime.now();
       var hours = now.hour;
       var minute = now.minute;
-      var timeDelayed = DateTime.now().add(Duration(seconds: 1));
+
+      // เวลาแจ้งเตือนที่แม่นยำ (เพิ่ม 1 วินาที)
+      final tz.TZDateTime timeDelayed =
+          tz.TZDateTime.now(tz.local).add(Duration(seconds: 1));
+
       const AndroidNotificationDetails androidNotificationDetails =
           AndroidNotificationDetails('nextflow_noti_001', 'แจ้งเตือนทั่วไป',
               importance: Importance.max,
@@ -178,12 +210,17 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       const NotificationDetails platformChannelDetails = NotificationDetails(
         android: androidNotificationDetails,
       );
-      await flutterLocalNotificationsPlugin.schedule(
-          0,
-          'แจ้งเตือน',
-          'เวลา $hours:$minute นาที อย่าลืมปิดรับงานขอบคุณครับ',
-          timeDelayed,
-          platformChannelDetails);
+
+      // ใช้ zonedSchedule แทน schedule
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        0,
+        'แจ้งเตือน',
+        'เวลา $hours:$minute นาที อย่าลืมปิดรับงานขอบคุณครับ',
+        timeDelayed,
+        platformChannelDetails,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
     });
   }
 

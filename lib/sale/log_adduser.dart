@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +18,6 @@ import 'package:technician/models/product_head_data_all_model.dart';
 import 'package:technician/models/product_job.dart';
 import 'package:technician/sale/addlocation.dart';
 import 'package:technician/utility/my_constant.dart';
-import 'package:technician/widgets/show_progress.dart';
 
 class Log_Adduser extends StatefulWidget {
   final String id_head_job, idcard, name_u, phone_u, address_u;
@@ -71,7 +70,6 @@ class _Log_AdduserState extends State<Log_Adduser> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     get_provinces();
     setState(() {

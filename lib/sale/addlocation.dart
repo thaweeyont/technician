@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -734,7 +734,8 @@ class _AddlocationState extends State<Addlocation> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color.fromRGBO(91, 117, 178, 1.0),
+                                  backgroundColor:
+                                      Color.fromRGBO(91, 117, 178, 1.0),
                                 ),
                                 label: Text(
                                   "บันทึก",
@@ -1246,7 +1247,8 @@ class _AddlocationState extends State<Addlocation> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color.fromRGBO(252, 186, 3, 1.0),
+                                  backgroundColor:
+                                      Color.fromRGBO(252, 186, 3, 1.0),
                                 ),
                                 label: Text(
                                   "แก้ไข",

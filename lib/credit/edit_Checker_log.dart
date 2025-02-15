@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_animated_dialog_updated/flutter_animated_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -266,9 +266,9 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
-          url = data_customer[0]['insert_maps_no1'];
+          url = data_customer[0]['insert_maps_no1'] ?? "";
 
-          if (url.isNotEmpty) {
+          if (url.isNotEmpty && url.contains('=')) {
             String numbersPart = url.split('=')[1];
             List<String> numbers = numbersPart.split(',');
             latitude = double.parse(numbers[0]);
@@ -335,8 +335,10 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
       if (respose.statusCode == 200) {
         setState(() {
           data_customer = json.decode(respose.body);
-          url = data_customer[0]['insert_maps_no1'];
-          if (url.isNotEmpty) {
+          url = data_customer[0]['insert_maps_no1'] ?? "";
+          print('url1>>$url');
+          if (url.isNotEmpty && url.contains('=')) {
+            print('url2>>$url');
             String numbersPart = url.split('=')[1];
             List<String> numbers = numbersPart.split(',');
             latitude = double.parse(numbers[0]);
@@ -1179,7 +1181,6 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
               ),
             ),
             Container(
-              // margin: EdgeInsets.only(bottom: 10.0),
               child: Column(
                 children: [
                   Row(
@@ -1243,7 +1244,7 @@ class _EditCheckerLogState extends State<EditCheckerLog> {
             ] else ...[
               Container(
                 padding: EdgeInsets.all(10),
-                color: Color.fromARGB(255, 228, 228, 228).withOpacity(0.3),
+                color: Color.fromARGB(255, 228, 228, 228).withAlpha(180),
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
